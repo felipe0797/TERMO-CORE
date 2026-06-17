@@ -1,0 +1,335 @@
+{
+    "themes": {
+        "Tecnologia": [
+            {
+                "word": "DADOS",
+                "diff": "Fácil"
+            },
+            {
+                "word": "NUVEM",
+                "diff": "Fácil"
+            },
+            {
+                "word": "CODIGO",
+                "diff": "Média"
+            },
+            {
+                "word": "SCRIPT",
+                "diff": "Média"
+            },
+            {
+                "word": "ALGORITMO",
+                "diff": "Difícil"
+            },
+            {
+                "word": "INTERFACE",
+                "diff": "Difícil"
+            }
+        ],
+        "Comida": [
+            {
+                "word": "ARROZ",
+                "diff": "Fácil"
+            },
+            {
+                "word": "PIZZA",
+                "diff": "Fácil"
+            },
+            {
+                "word": "LASANHA",
+                "diff": "Média"
+            },
+            {
+                "word": "COXINHA",
+                "diff": "Média"
+            },
+            {
+                "word": "ESTROGONOFE",
+                "diff": "Difícil"
+            },
+            {
+                "word": "BACALHAU",
+                "diff": "Difícil"
+            }
+        ],
+        "Animais": [
+            {
+                "word": "GATO",
+                "diff": "Fácil"
+            },
+            {
+                "word": "LEAO",
+                "diff": "Fácil"
+            },
+            {
+                "word": "CACHORRO",
+                "diff": "Média"
+            },
+            {
+                "word": "GIRAFA",
+                "diff": "Média"
+            },
+            {
+                "word": "ORNITORRINCO",
+                "diff": "Difícil"
+            },
+            {
+                "word": "HIPOPOTAMO",
+                "diff": "Difícil"
+            }
+        ],
+        "Geografia": [
+            {
+                "word": "PAIS",
+                "diff": "Fácil"
+            },
+            {
+                "word": "MAPA",
+                "diff": "Fácil"
+            },
+            {
+                "word": "BRASIL",
+                "diff": "Média"
+            },
+            {
+                "word": "EUROPA",
+                "diff": "Média"
+            },
+            {
+                "word": "CONTINENTE",
+                "diff": "Difícil"
+            },
+            {
+                "word": "HEMISFERIO",
+                "diff": "Difícil"
+            }
+        ],
+        "Filmes": [
+            {
+                "word": "ATOR",
+                "diff": "Fácil"
+            },
+            {
+                "word": "CENA",
+                "diff": "Fácil"
+            },
+            {
+                "word": "ROTEIRO",
+                "diff": "Média"
+            },
+            {
+                "word": "CINEMA",
+                "diff": "Média"
+            },
+            {
+                "word": "BLOCKBUSTER",
+                "diff": "Difícil"
+            },
+            {
+                "word": "BILHETERIA",
+                "diff": "Difícil"
+            }
+        ],
+        "Carros": [
+            {
+                "word": "MOTOR",
+                "diff": "Fácil"
+            },
+            {
+                "word": "RODA",
+                "diff": "Fácil"
+            },
+            {
+                "word": "VOLANTE",
+                "diff": "Média"
+            },
+            {
+                "word": "MARCHA",
+                "diff": "Média"
+            },
+            {
+                "word": "CARBURADOR",
+                "diff": "Difícil"
+            },
+            {
+                "word": "SUSPENSAO",
+                "diff": "Difícil"
+            }
+        ],
+        "Esportes": [
+            {
+                "word": "BOLA",
+                "diff": "Fácil"
+            },
+            {
+                "word": "GOL",
+                "diff": "Fácil"
+            },
+            {
+                "word": "FUTEBOL",
+                "diff": "Média"
+            },
+            {
+                "word": "TENIS",
+                "diff": "Média"
+            },
+            {
+                "word": "OLIMPIADAS",
+                "diff": "Difícil"
+            },
+            {
+                "word": "ATLETISMO",
+                "diff": "Difícil"
+            }
+        ],
+        "Corpo Humano": [
+            {
+                "word": "MAO",
+                "diff": "Fácil"
+            },
+            {
+                "word": "PE",
+                "diff": "Fácil"
+            },
+            {
+                "word": "CORACAO",
+                "diff": "Média"
+            },
+            {
+                "word": "PULMAO",
+                "diff": "Média"
+            },
+            {
+                "word": "ESQUELETO",
+                "diff": "Difícil"
+            },
+            {
+                "word": "NEURONIO",
+                "diff": "Difícil"
+            }
+        ],
+        "Profissões": [
+            {
+                "word": "MEDICO",
+                "diff": "Fácil"
+            },
+            {
+                "word": "JUIZ",
+                "diff": "Fácil"
+            },
+            {
+                "word": "BOMBEIRO",
+                "diff": "Média"
+            },
+            {
+                "word": "POLICIAL",
+                "diff": "Média"
+            },
+            {
+                "word": "ENGENHEIRO",
+                "diff": "Difícil"
+            },
+            {
+                "word": "ARQUITETO",
+                "diff": "Difícil"
+            }
+        ],
+        "Objetos": [
+            {
+                "word": "MESA",
+                "diff": "Fácil"
+            },
+            {
+                "word": "CADEIRA",
+                "diff": "Fácil"
+            },
+            {
+                "word": "CADERNO",
+                "diff": "Média"
+            },
+            {
+                "word": "CANETA",
+                "diff": "Média"
+            },
+            {
+                "word": "COMPUTADOR",
+                "diff": "Difícil"
+            },
+            {
+                "word": "TELEVISAO",
+                "diff": "Difícil"
+            }
+        ]
+    },
+    "valid_dictionary": [
+        "ENGENHEIRO",
+        "SAGAZ",
+        "TELEVISAO",
+        "LEAO",
+        "CACHORRO",
+        "PORTA",
+        "CADEIRA",
+        "CANETA",
+        "SUSPENSAO",
+        "ESTROGONOFE",
+        "BLOCKBUSTER",
+        "CINEMA",
+        "MAO",
+        "FUTEBOL",
+        "BILHETERIA",
+        "ROTEIRO",
+        "GATO",
+        "CONTINENTE",
+        "PAIS",
+        "MOTOR",
+        "ARROZ",
+        "BOMBEIRO",
+        "BOLA",
+        "LASANHA",
+        "DADOS",
+        "MEDICO",
+        "RODA",
+        "LIVRO",
+        "COMPUTADOR",
+        "CODIGO",
+        "GOL",
+        "CARBURADOR",
+        "MUNDO",
+        "OLIMPIADAS",
+        "FESTA",
+        "INTERFACE",
+        "TENIS",
+        "HIPOPOTAMO",
+        "VOLANTE",
+        "ATLETISMO",
+        "POLICIAL",
+        "COXINHA",
+        "JUIZ",
+        "CADERNO",
+        "ESQUELETO",
+        "ATOR",
+        "HEMISFERIO",
+        "PULMAO",
+        "NUVEM",
+        "ARQUITETO",
+        "TEMPO",
+        "SCRIPT",
+        "NEURONIO",
+        "PIZZA",
+        "MESA",
+        "EUROPA",
+        "CENA",
+        "MARCHA",
+        "PE",
+        "BRASIL",
+        "BACALHAU",
+        "ALGORITMO",
+        "TERMO",
+        "CASAS",
+        "MAPA",
+        "ORNITORRINCO",
+        "AMIGO",
+        "GIRAFA",
+        "CORACAO"
+    ]
+}

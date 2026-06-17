@@ -1,0 +1,71 @@
+============================================================
+   TERMOPRO - REFERÊNCIA TÉCNICA E ARQUITETURA
+============================================================
+
+Este documento descreve o funcionamento completo do projeto TermoPro - Funcional, um jogo de palavras avançado baseado no "Termo", mas com extensas customizações de economia, modos de jogo e uma campanha narrativa (Modo Jornada).
+
+1. ESTRUTURA DE ARQUIVOS
+------------------------------------------------------------
+- index.html: Ponto de entrada SPA (Single Page Application). Contém todas as telas (Login, Menu, Loja, Ranking, Jogo) e modais.
+- styles.css: Estilos globais, temas (Neon, Dark) e responsividade (Desktop, Tablet, Mobile).
+- script.js: Motor principal do jogo. Gerencia autenticação, estado global, economia, XP, troféus e os modos de jogo base.
+- palavras.js: Banco de dados principal (BANCO_DE_PALAVRAS) dividido por tamanho (5, 7 letras) e dificuldade (Fácil, Normal, Difícil).
+- words_db.js: Banco secundário/legado para validação e suporte a palavras customizadas.
+- story_mode/ (Pasta do Modo Jornada):
+    - story_data.js: Definições de capítulos, fases, recompensas e anomalias.
+    - story_mode.js: Lógica de progresso, mapa de fases e injeção de anomalias no motor principal.
+    - story_mode.css: Estilos visuais específicos para a campanha.
+
+2. SISTEMA DE AUTENTICAÇÃO E PERSISTÊNCIA
+------------------------------------------------------------
+- LocalStorage: Todos os dados são salvos localmente no navegador.
+- Chaves principais:
+    - `users`: Dicionário de usuários e seus PINs de 4 dígitos.
+    - `termo_user_{nome}`: Objeto JSON com estatísticas, moedas, XP, itens comprados e troféus desbloqueados.
+    - `STORY_MODE_DATA`: Progresso da jornada (fases completas, estrelas, baús resgatados).
+- Usuário Admin: O usuário "admin" (PIN padrão 0000) tem acesso ao "Hack Mode" (revela a palavra) e ao botão de "Reset DB".
+
+3. ECONOMIA E PROGRESSÃO
+------------------------------------------------------------
+- Moedas (Coins): Ganhas ao vencer partidas e abrir baús. Usadas para comprar dicas (Hints) e itens na Loja.
+- XP e Nível: XP é ganho em vitórias e troféus. O nível é calculado via fórmula exponencial `Math.floor(Math.pow(xp / 100, 1/1.5))`.
+- Loja (Shop): Venda de cosméticos (Temas e Avatares). Itens comprados são salvos em `userStats.ownedItems`.
+- Troféus: Conquistas automáticas baseadas em gatilhos (Ex: 1ª vitória, nível 10, 10k moedas).
+
+4. MOTOR DE JOGO E SORTEIO
+------------------------------------------------------------
+- Dificuldades: 
+    - EASY: Apenas palavras fáceis, multiplicador 0.5x.
+    - NORMAL: Sorteio probabilístico (25% Fácil, 50% Médio, 25% Difícil), multiplicador 1.0x.
+    - HARD: Apenas palavras difíceis, multiplicador 1.5x.
+- Anti-Repetição: O motor utiliza `currentGame.usedWordsMemory` (um Set) para garantir que a mesma palavra não apareça duas vezes na mesma sessão de jogo.
+- Lógica Wordle: Implementação fiel para tratamento de letras repetidas (Verde = Correta, Amarelo = Existe em outra posição, Cinza = Ausente).
+
+5. MODOS DE JOGO BASE
+------------------------------------------------------------
+- 5 LETRAS: Progressão em 3 etapas (1 tabuleiro -> 3 tabuleiros -> 5 tabuleiros).
+- 7 LETRAS: Desafio em 2 etapas (1 tabuleiro -> 2 tabuleiros).
+- SOBREVIVÊNCIA: Rodadas infinitas com 3 vidas. Loja de vidas disponível a cada 5 rodadas (preço escala exponencialmente).
+- AVALANCHE: Ciclo de fases onde o número de tabuleiros cresce de 1 a 5.
+
+6. MODO JORNADA (STORY MODE)
+------------------------------------------------------------
+- Arquitetura: Funciona via injeção de configuração (`phaseConfig`) no motor principal.
+- Anomalias (Mecânicas Especiais):
+    - THERMAL_OVERLOAD: Cronômetro regressivo.
+    - BLOCKED_CELLS: Células do grid que não aceitam entrada.
+    - FORBIDDEN_LETTERS: Letras que não podem ser usadas no palpite.
+    - DELAYED_FEEDBACK: Feedback visual (cores) só aparece após o 4º palpite.
+    - CONVEYOR_CHAOS: Novos tabuleiros surgem após erros.
+- Sistema de Estrelas: 1 a 3 estrelas baseadas no número de tentativas.
+- Baús de Capítulo: Recompensas cumulativas baseadas no total de estrelas do capítulo.
+
+7. INTEGRAÇÃO E EXTENSIBILIDADE
+------------------------------------------------------------
+- O jogo é uma SPA. A navegação entre abas ocorre via `showMainTab(tabName)`.
+- Para adicionar novas palavras, basta editar o objeto `BANCO_DE_PALAVRAS` em `palavras.js`.
+- Para criar novas jornadas, basta adicionar novos objetos em `JORNADAS_DEFINITIONS` no `story_data.js`.
+
+============================================================
+DOCUMENTO GERADO EM 15/06/2026 - VERSÃO 4.0 (FUNCIONAL)
+============================================================

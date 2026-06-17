@@ -1,0 +1,892 @@
+/* STORY_MODE.CSS - Estilos do Modo História */
+
+/* ============================================================
+   VARIÁVEIS E CORES TEMÁTICAS
+   ============================================================ */
+:root {
+    --story-primary: #6366f1;
+    --story-secondary: #8b5cf6;
+    --story-accent: #ec4899;
+    --story-success: #10b981;
+    --story-warning: #f59e0b;
+    --story-danger: #ef4444;
+    --story-dark: #0f172a;
+    --story-light: #f8fafc;
+}
+
+/* ============================================================
+   SELETOR DE JORNADAS
+   ============================================================ */
+.story-journey-selector {
+    display: flex;
+    gap: 12px;
+    padding: 20px;
+    overflow-x: auto;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-radius: 12px;
+    margin: 0 20px 20px;
+}
+
+.journey-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    min-width: fit-content;
+}
+
+.journey-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+    transform: translateY(-2px);
+}
+
+.journey-btn.active {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-color: #ec4899;
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+}
+
+.journey-icon {
+    font-size: 20px;
+}
+
+.journey-name {
+    display: block;
+}
+
+/* ============================================================
+   MAPA DE JORNADA
+   ============================================================ */
+.story-map-container {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 300px);
+}
+
+.story-map {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* ============================================================
+   CAPÍTULO
+   ============================================================ */
+.story-chapter {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.story-chapter:hover {
+    border-color: rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.chapter-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.chapter-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 24px;
+    color: white;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+}
+
+.chapter-title {
+    flex: 1;
+}
+
+.chapter-title h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #e2e8f0;
+    font-weight: 700;
+}
+
+.chapter-title p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.chapter-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+.progress-bar {
+    width: 80px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981 0%, #06b6d4 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* ============================================================
+   FASES (NÓS DO MAPA)
+   ============================================================ */
+.phases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.phase-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.phase-node.completed {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+.phase-node.current {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.8);
+    animation: pulse-border 2s infinite;
+}
+
+.phase-node.locked {
+    background: rgba(100, 116, 139, 0.1);
+    border-color: rgba(100, 116, 139, 0.3);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.phase-node.boss {
+    border-width: 3px;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.phase-node:hover:not(.locked) {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.1);
+    }
+}
+
+.phase-icon {
+    font-size: 24px;
+}
+
+.phase-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #cbd5e1;
+    text-align: center;
+}
+
+.phase-stars {
+    display: flex;
+    gap: 2px;
+    font-size: 10px;
+}
+
+.phase-stars .star {
+    color: #f59e0b;
+}
+
+.phase-stars .star.empty {
+    color: rgba(148, 163, 184, 0.3);
+}
+
+.phase-lock {
+    font-size: 16px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}
+
+/* ============================================================
+   PAINEL DE INFORMAÇÕES DO CAPÍTULO
+   ============================================================ */
+.chapter-info-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 350px;
+    height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-left: 2px solid rgba(99, 102, 241, 0.3);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    overflow-y: auto;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.chapter-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+}
+
+.chapter-info-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #e2e8f0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #e2e8f0;
+}
+
+.chapter-info-content {
+    padding: 20px;
+}
+
+.chapter-info-content p {
+    margin: 0 0 20px;
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.chapter-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 8px;
+}
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.stat strong {
+    color: #e2e8f0;
+    font-weight: 700;
+}
+
+.chapter-chests {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ============================================================
+   BAÚS DE CAPÍTULO
+   ============================================================ */
+.chest-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chest-item:hover:not(.locked) {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.6);
+    transform: translateX(4px);
+}
+
+.chest-item.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.chest-icon {
+    font-size: 32px;
+}
+
+.chest-info {
+    flex: 1;
+}
+
+.chest-type {
+    font-weight: 700;
+    color: #e2e8f0;
+    font-size: 13px;
+}
+
+.chest-requirement {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.chest-arrow {
+    font-size: 16px;
+    color: #6366f1;
+}
+
+/* ============================================================
+   MODAL DE BRIEFING
+   ============================================================ */
+.story-briefing-box {
+    max-width: 500px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border: 2px solid rgba(99, 102, 241, 0.5);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+    color: #e2e8f0;
+}
+
+.briefing-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+}
+
+.briefing-icon {
+    font-size: 40px;
+}
+
+.briefing-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #e2e8f0;
+}
+
+.briefing-content {
+    margin-bottom: 20px;
+}
+
+.briefing-text {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    color: #cbd5e1;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0 0 15px;
+}
+
+.briefing-records {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+.stars-display {
+    display: flex;
+    gap: 4px;
+}
+
+.star {
+    font-size: 18px;
+    color: #f59e0b;
+}
+
+.star.empty {
+    color: rgba(148, 163, 184, 0.3);
+}
+
+.briefing-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ============================================================
+   MODAL DE RECOMPENSA - DESIGN PROFISSIONAL GAMER
+   ============================================================ */
+.story-reward-box {
+    max-width: 450px;
+    background: #0a0f1e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(16, 185, 129, 0.2);
+    text-align: center;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.story-reward-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #10b981, #3b82f6);
+}
+
+.reward-header {
+    background: linear-gradient(to bottom, rgba(16, 185, 129, 0.1), transparent);
+    padding: 30px 20px;
+    position: relative;
+}
+
+.reward-status-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+    animation: pulseIcon 2s infinite ease-in-out;
+}
+
+@keyframes pulseIcon {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.8)); }
+}
+
+.reward-header h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.stars-earned {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 10px 0 25px 0;
+    font-size: 40px;
+}
+
+.star {
+    color: #fbbf24;
+    text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+}
+
+.star.empty {
+    color: rgba(255, 255, 255, 0.1);
+    text-shadow: none;
+}
+
+.reward-content {
+    padding: 0 30px 30px 30px;
+}
+
+.rewards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.reward-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.reward-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.reward-card-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.reward-card-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.reward-card-label {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.reward-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-reward-next {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-reward-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    filter: brightness(1.1);
+}
+
+.btn-reward-back {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-reward-back:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.reward-label {
+    font-weight: 600;
+}
+
+.reward-value {
+    color: #10b981;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* ============================================================
+   MODAL DE BAÚ
+   ============================================================ */
+.story-chest-box {
+    max-width: 400px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border: 2px solid rgba(245, 158, 11, 0.5);
+    text-align: center;
+}
+
+.chest-header {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.chest-header h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #e2e8f0;
+}
+
+.chest-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 8px;
+}
+
+.chest-reward-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #cbd5e1;
+    padding: 8px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 6px;
+}
+
+.chest-reward-label {
+    font-weight: 600;
+}
+
+.chest-reward-value {
+    color: #f59e0b;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width: 768px) {
+    .story-journey-selector {
+        margin: 0 10px 15px;
+    }
+
+    .story-map-container {
+        padding: 10px;
+    }
+
+    .phases-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+    }
+
+    .chapter-info-panel {
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        height: 60vh;
+        border-left: none;
+        border-top: 2px solid rgba(99, 102, 241, 0.3);
+        animation: slideInUp 0.3s ease;
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    .story-briefing-box,
+    .story-reward-box,
+    .story-chest-box {
+        max-width: 90vw;
+    }
+}
+
+@media (max-width: 480px) {
+    .phases-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 6px;
+    }
+
+    .phase-node {
+        padding: 8px;
+    }
+
+    .phase-icon {
+        font-size: 20px;
+    }
+
+    .phase-label {
+        font-size: 10px;
+    }
+
+    .chapter-number {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}
+
+/* ============================================================
+   ESTILOS NARRATIVOS E TERMINAL
+   ============================================================ */
+.story-intro-box {
+    max-width: 600px;
+    background: #050505;
+    border: 1px solid #00ff00;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+    padding: 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.terminal-header {
+    background: #1a1a1a;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #333;
+}
+
+.terminal-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.terminal-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.terminal-dots span:nth-child(1) { background: #ff5f56; }
+.terminal-dots span:nth-child(2) { background: #ffbd2e; }
+.terminal-dots span:nth-child(3) { background: #27c93f; }
+
+.terminal-title {
+    color: #888;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.terminal-body {
+    padding: 30px;
+    min-height: 200px;
+    color: #00ff00;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.terminal-line {
+    margin-bottom: 15px;
+    opacity: 0;
+    animation: typeIn 0.5s forwards;
+    border-left: 2px solid transparent;
+    padding-left: 10px;
+}
+
+.terminal-line:hover {
+    border-left: 2px solid #00ff00;
+    background: rgba(0, 255, 0, 0.05);
+}
+
+@keyframes typeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.terminal-footer {
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #1a1a1a;
+}
+
+/* Seções de História nos Modais */
+.briefing-title-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.briefing-subtitle {
+    font-size: 14px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.briefing-story-section, .reward-story-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 3px solid #3b82f6;
+    text-align: left;
+}
+
+.story-label {
+    font-size: 10px;
+    font-weight: bold;
+    color: #3b82f6;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.briefing-story-text, .reward-story-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #e2e8f0;
+    font-style: italic;
+    margin: 0;
+}
+
+.reward-story-section {
+    margin: 0 20px 20px;
+    border-left: 3px solid #10b981;
+}

@@ -1,0 +1,90 @@
+============================================================
+       TERMOPRO v4.5 - GUIA MESTRE DE REFERÊNCIA TÉCNICA
+============================================================
+
+Este documento contém a arquitetura, regras de negócio e lógicas 
+fundamentais do projeto TermoPro. Use-o como guia para futuras 
+atualizações para manter a integridade do sistema.
+
+------------------------------------------------------------
+1. ARQUITETURA DE ARQUIVOS
+------------------------------------------------------------
+- index.html: SPA (Single Page Application) com todos os modais e telas.
+- styles.css: Design Glassmorphism e Layout Horizontal (Sidebar).
+- script.js: Motor principal (Wordle Engine, Economia, Persistência).
+- palavras.js: Banco de 3.000 palavras únicas (500 por categoria).
+- story_mode/story_data.js: Definições de capítulos, fases e narrativa.
+- story_mode/story_mode.js: Controlador da interface da Jornada.
+- story_mode/story_mode.css: Estilos exclusivos da Jornada e Terminal.
+
+------------------------------------------------------------
+2. SISTEMA DE DIFICULDADE (LÓGICA PROBABILÍSTICA)
+------------------------------------------------------------
+A dificuldade é global e afeta o sorteio de palavras em todos os modos:
+
+- FÁCIL: 70% palavras fáceis | 30% palavras médias.
+- NORMAL: 50% médias | 25% fáceis | 25% difíceis.
+- DIFÍCIL: 70% palavras difíceis | 30% palavras médias.
+
+*Nota: A dificuldade NORMAL é o padrão obrigatório na inicialização.
+O jogador não pode "desmarcar" a dificuldade ativa na sidebar.*
+
+------------------------------------------------------------
+3. BANCO DE PALAVRAS E VALIDAÇÃO
+------------------------------------------------------------
+- Total: 3.000 palavras únicas em Português.
+- Categorias: Letras 5 (Facil/Medio/Dificil) e Letras 7 (Facil/Medio/Dificil).
+- Validação: O jogo aceita qualquer entrada do usuário (Validação Flexível), 
+  mas o sorteio do sistema é restrito às 3.000 palavras do banco.
+- Anti-Repetição: Memória de sessão que evita repetir palavras na mesma partida.
+
+------------------------------------------------------------
+4. MODOS DE JOGO PRINCIPAIS
+------------------------------------------------------------
+- 5 LETRAS: 3 etapas progressivas (1, 2 e 4 tabuleiros).
+- 7 LETRAS: 2 etapas progressivas (1 e 2 tabuleiros).
+- SOBREVIVÊNCIA: Rodadas infinitas, 1 tabuleiro, 3 vidas iniciais. 
+  Loja de vidas a cada 5, 15, 30 e 50 rodadas.
+- AVALANCHE: Fases com tempo e múltiplos tabuleiros simultâneos.
+
+------------------------------------------------------------
+5. MODO JORNADA (OPERAÇÃO CÓDIGO PRIMÁRIO)
+------------------------------------------------------------
+- Narrativa: Infiltração no Aegis Core para purgar o Parasita.
+- Intro: Modal de terminal estilo hacker na primeira inicialização.
+- Fluxo de Fase: Briefing Narrativo -> Partida -> Recompensa/História.
+- Revelação: Em caso de derrota, a palavra secreta é revelada no relatório.
+- Persistência: Todo o progresso (estrelas, fases, baús) é salvo dentro 
+  do objeto 'userStats' do perfil do usuário no localStorage.
+
+------------------------------------------------------------
+6. SISTEMA DE ANOMALIAS (EXCLUSIVO JORNADA)
+------------------------------------------------------------
+- THERMAL_OVERLOAD: Cronômetro regressivo de alta precisão (Date.now()).
+- BLOCKED_CELLS: Células do grid travadas que impedem digitação.
+- FORBIDDEN_LETTERS: Letras do teclado que não podem ser usadas.
+- DELAYED_FEEDBACK: Cores das letras só aparecem após o 4º palpite.
+- AVALANCHE_ACCELERATED: Múltiplos tabuleiros (até 4) simultâneos.
+- TIME_BONUS: Ganha tempo extra ao acertar letras verdes (Boss).
+
+------------------------------------------------------------
+7. ECONOMIA E PROGRESSÃO
+------------------------------------------------------------
+- Moedas: Ganhas ao vencer fases ou coletar baús. Usadas para Dicas e Loja.
+- XP: Define o Nível do Jogador. Desbloqueia troféus e badges.
+- Loja: Skins de temas (Neon, Dark) e Avatares exclusivos.
+- Baús de Capítulo: Desbloqueados por estrelas (Bronze, Prata, Ouro).
+
+------------------------------------------------------------
+8. REGRAS TÉCNICAS IMPORTANTES
+------------------------------------------------------------
+- Sincronização: O motor de jogo em script.js comunica-se com a jornada 
+  via callbacks injetados em 'startStoryMode'.
+- Timer: O timer da jornada usa checagem a cada 100ms para precisão, 
+  mas decremento visual de 1s.
+- Retorno: O botão 'Voltar ao Mapa' força a troca de aba para 'story-mode' 
+  através da função 'showMainTab'.
+
+============================================================
+      FIM DO DOCUMENTO - CRIADO POR MANUS AI - 2026
+============================================================

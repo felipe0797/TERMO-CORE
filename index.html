@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TERMO PRO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="story_mode/story_mode.css">
+</head>
+<body>
+
+<!-- ===== TELA DE LOGIN ===== -->
+<div id="screen-login" class="screen active">
+    <div class="login-bg-glow"></div>
+    <div class="login-card">
+        <div class="login-logo">
+            <span class="logo-termo">TERMO</span><span class="logo-pro">PRO</span>
+        </div>
+        <p class="login-subtitle">Criado por Felpz</p>
+
+        <div id="login-form" class="auth-form">
+            <div class="input-group">
+                <label>USUÁRIO</label>
+                <input type="text" id="auth-user" placeholder="seu usuário" maxlength="15" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>PIN</label>
+                <input type="password" id="auth-pin" placeholder="4 dígitos" maxlength="4" inputmode="numeric">
+            </div>
+            <button onclick="handleAuth()" class="btn-primary btn-full">ENTRAR</button>
+            <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Criar conta</button>
+        </div>
+
+        <div id="register-form" class="auth-form hidden">
+            <div class="input-group">
+                <label>NOVO USUÁRIO</label>
+                <input type="text" id="reg-user" placeholder="escolha um nome" maxlength="15" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>PIN</label>
+                <input type="password" id="reg-pin" placeholder="4 dígitos" maxlength="4" inputmode="numeric">
+            </div>
+            <div class="input-group">
+                <label>CONFIRMAR PIN</label>
+                <input type="password" id="reg-pin-confirm" placeholder="repita o PIN" maxlength="4" inputmode="numeric">
+            </div>
+            <button onclick="handleRegister()" class="btn-primary btn-full">CADASTRAR</button>
+            <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Voltar ao login</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TELA PRINCIPAL (MENU + SIDEBAR) ===== -->
+<div id="screen-main" class="screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="sidebar-top">
+            <div class="sidebar-avatar" id="sidebar-avatar">?</div>
+            <div class="sidebar-username" id="sidebar-username">Usuário</div>
+            <div class="sidebar-level-badge" id="sidebar-level-badge">Nível 1</div>
+        </div>
+
+        <div class="sidebar-xp-block">
+            <div class="xp-label-row">
+                <span id="sidebar-xp-label">0 XP</span>
+                <span id="sidebar-xp-next">/ 100 XP</span>
+            </div>
+            <div class="xp-bar-track">
+                <div class="xp-bar-fill" id="sidebar-xp-bar" style="width:0%"></div>
+            </div>
+        </div>
+
+        <div class="sidebar-coins" id="sidebar-coins">
+            <span class="coin-icon">💰</span>
+            <span id="sidebar-coins-value">0</span>
+        </div>
+
+        <div class="sidebar-diff-block">
+            <div class="sidebar-section-label">DIFICULDADE</div>
+            <div class="diff-buttons">
+                <button id="diff-easy"   class="diff-btn" onclick="setDifficulty('EASY')">
+                    <span>🟢</span><span>Fácil</span><small>0.5×</small>
+                </button>
+                <button id="diff-normal" class="diff-btn active" onclick="setDifficulty('NORMAL')">
+                    <span>🟡</span><span>Normal</span><small>1.0×</small>
+                </button>
+                <button id="diff-hard"   class="diff-btn" onclick="setDifficulty('HARD')">
+                    <span>🔴</span><span>Difícil</span><small>1.5×</small>
+                </button>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="sidebar-nav-btn" onclick="showMainTab('menu')">🎮 Jogar</button>
+            <button class="sidebar-nav-btn" onclick="startStoryMode()">📖 Jornadas</button>
+            <button class="sidebar-nav-btn" onclick="showMainTab('ranking')">🏆 Ranking</button>
+            <button class="sidebar-nav-btn" onclick="showMainTab('trophies')">🎖️ Conquistas</button>
+            <button class="sidebar-nav-btn" onclick="showMainTab('shop')">🛒 Loja</button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn-logout">Sair</button>
+            <button id="reset-btn" onclick="resetDatabase()" class="btn-reset hidden">🔄 Reset DB</button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main id="main-content">
+
+        <!-- TAB: MENU -->
+        <div id="tab-menu" class="main-tab active">
+            <header class="main-header">
+                <div class="header-logo">TERMO<span>PRO</span></div>
+                <div class="header-right">
+                    <span id="header-user-display"></span>
+                    <button class="btn-icon-header" onclick="showMainTab('ranking')" title="Ranking">🏆</button>
+                    <button class="btn-icon-header" onclick="showMainTab('trophies')" title="Conquistas">🎖️</button>
+                </div>
+            </header>
+
+            <div class="modes-grid">
+                <button onclick="startMode('5_LETTERS')" class="mode-card">
+                    <div class="mode-card-icon">5️⃣</div>
+                    <div class="mode-card-name">5 LETRAS</div>
+                    <div class="mode-card-desc">3 etapas progressivas</div>
+                </button>
+                <button onclick="startMode('7_LETTERS')" class="mode-card">
+                    <div class="mode-card-icon">7️⃣</div>
+                    <div class="mode-card-name">7 LETRAS</div>
+                    <div class="mode-card-desc">2 etapas desafiadoras</div>
+                </button>
+                <button onclick="startMode('SURVIVAL')" class="mode-card">
+                    <div class="mode-card-icon">❤️</div>
+                    <div class="mode-card-name">SOBREVIVÊNCIA</div>
+                    <div class="mode-card-desc">Quantas rodadas aguentar?</div>
+                </button>
+                <button onclick="startMode('AVALANCHE')" class="mode-card">
+                    <div class="mode-card-icon">🏔️</div>
+                    <div class="mode-card-name">AVALANCHE</div>
+                    <div class="mode-card-desc">Palavras crescem por fase</div>
+                </button>
+                <button onclick="startStoryMode()" class="mode-card">
+                    <div class="mode-card-icon">📖</div>
+                    <div class="mode-card-name">JORNADAS</div>
+                    <div class="mode-card-desc">Campanha com história</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Loja -->
+            <div id="tab-shop" class="main-tab">
+                <header class="main-header">
+                    <div class="header-logo">🛒 <span>LOJA</span></div>
+                    <div class="header-right">Itens exclusivos e cosméticos</div>
+                </header>
+                <div id="shop-items-grid" class="shop-grid"></div>
+            </div>
+
+            <!-- Tab Ranking -->
+            <div id="tab-ranking" class="main-tab">
+            <header class="main-header">
+                <div class="header-logo">RANKING</div>
+            </header>
+            <div class="ranking-tabs">
+                <button onclick="updateRankingStats('5_LETTERS')"  class="ranking-mode-btn active">5 Letras</button>
+                <button onclick="updateRankingStats('7_LETTERS')"  class="ranking-mode-btn">7 Letras</button>
+                <button onclick="updateRankingStats('SURVIVAL')"   class="ranking-mode-btn">Sobrevivência</button>
+                <button onclick="updateRankingStats('AVALANCHE')"  class="ranking-mode-btn">Avalanche</button>
+            </div>
+            <div class="ranking-stats">
+                <div class="stat-row"><span>Vitórias</span><span data-stat="wins">0</span></div>
+                <div class="stat-row"><span>Derrotas</span><span data-stat="losses">0</span></div>
+                <div class="stat-row"><span>Score Total</span><span data-stat="score">0</span></div>
+                <div class="stat-row"><span>Partidas Totais</span><span data-stat="games">0</span></div>
+                <div class="stat-row"><span>Sequência Atual</span><span data-stat="streak">0</span></div>
+            </div>
+        </div>
+
+        <!-- TAB: CONQUISTAS -->
+        <div id="tab-trophies" class="main-tab">
+            <header class="main-header">
+                <div class="header-logo">CONQUISTAS</div>
+            </header>
+            <div id="trophies-grid" class="trophies-grid"></div>
+        </div>
+
+        <!-- TAB: MODO HISTÓRIA -->
+        <div id="tab-story-mode" class="main-tab">
+            <header class="main-header">
+                <div class="header-logo">📖 <span>JORNADAS</span></div>
+                <div class="header-right">Decodifique as chaves de segurança</div>
+            </header>
+
+            <!-- Seletor de Jornadas -->
+            <div class="story-journey-selector">
+                <button class="journey-btn active" onclick="switchJourney('jornada_1')">
+                    <span class="journey-icon">⚡</span>
+                    <span class="journey-name">Operação Código Primário</span>
+                </button>
+            </div>
+
+            <!-- Mapa de Jornada -->
+            <div class="story-map-container">
+                <div class="story-map" id="story-map">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
+            </div>
+
+            <!-- Informações do Capítulo -->
+            <div class="chapter-info-panel" id="chapter-info-panel" style="display: none;">
+                <div class="chapter-info-header">
+                    <h3 id="chapter-title"></h3>
+                    <button class="close-btn" onclick="closeChapterInfo()">×</button>
+                </div>
+                <div class="chapter-info-content">
+                    <p id="chapter-description"></p>
+                    <div class="chapter-stats">
+                        <div class="stat"><span>Estrelas Coletadas:</span> <strong id="chapter-stars">0/30</strong></div>
+                        <div class="stat"><span>Progresso:</span> <strong id="chapter-progress">0%</strong></div>
+                    </div>
+                    <div class="chapter-chests" id="chapter-chests">
+                        <!-- Baús serão renderizados aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Introdução da História -->
+        <div id="story-intro-modal" class="modal-overlay hidden">
+            <div class="modal-box story-intro-box">
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="terminal-title">AEGIS_CORE_INFILTRATION.EXE</div>
+                </div>
+                <div class="terminal-body" id="story-intro-text">
+                    <!-- Texto de intro será renderizado aqui -->
+                </div>
+                <div class="terminal-footer">
+                    <button class="btn-primary" onclick="closeStoryIntro()">INICIAR OPERAÇÃO</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Briefing da Fase -->
+        <div id="story-briefing-modal" class="modal-overlay hidden">
+            <div class="modal-box story-briefing-box">
+                <button class="modal-close-btn" onclick="closeBriefingModal()">×</button>
+                <div class="briefing-header">
+                    <div class="briefing-icon" id="briefing-icon">⚙️</div>
+                    <div class="briefing-title-group">
+                        <h2 id="briefing-title">Fase 1</h2>
+                        <div id="briefing-subtitle" class="briefing-subtitle">Sincronização de Dados</div>
+                    </div>
+                </div>
+                <div class="briefing-content">
+                    <div class="briefing-story-section">
+                        <div class="story-label">TRANSMISSÃO RECEBIDA:</div>
+                        <p id="briefing-story" class="briefing-story-text"></p>
+                    </div>
+                    <pre id="briefing-text" class="briefing-text"></pre>
+                    <div class="briefing-records">
+                        <span>Recordes Anteriores:</span>
+                        <div class="stars-display" id="briefing-stars">
+                            <span class="star">☆</span>
+                            <span class="star">☆</span>
+                            <span class="star">☆</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="briefing-actions">
+                    <button class="btn-primary btn-full" onclick="startStoryPhase()">
+                        INJETAR CÓDIGO DE PURGA
+                    </button>
+                    <button class="btn-ghost btn-full" onclick="closeBriefingModal()">
+                        Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Recompensa de Fase -->
+        <div id="story-reward-modal" class="modal-overlay hidden">
+            <div class="modal-box story-reward-box">
+                <div class="reward-header" id="reward-header">
+                    <div class="reward-status-icon" id="reward-status-icon">✅</div>
+                    <h2 id="reward-title">FASE CONCLUÍDA!</h2>
+                </div>
+                
+                <div class="reward-content">
+                    <div class="reward-story-section">
+                        <div class="story-label">RELATÓRIO DE MISSÃO:</div>
+                        <p id="reward-story" class="reward-story-text"></p>
+                    </div>
+                    <div class="stars-earned" id="stars-earned">
+                        <!-- Estrelas dinâmicas -->
+                    </div>
+                    
+                    <div class="rewards-grid">
+                        <div class="reward-card">
+                            <div class="reward-card-icon">💰</div>
+                            <div class="reward-card-value" id="reward-coins">+0</div>
+                            <div class="reward-card-label">Moedas</div>
+                        </div>
+                        <div class="reward-card">
+                            <div class="reward-card-icon">⭐</div>
+                            <div class="reward-card-value" id="reward-xp">+0</div>
+                            <div class="reward-card-label">XP</div>
+                        </div>
+                    </div>
+                    
+                    <div class="reward-actions" id="reward-actions">
+                        <!-- Botões dinâmicos -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Baú de Capítulo -->
+        <div id="story-chest-modal" class="modal-overlay hidden">
+            <div class="modal-box story-chest-box">
+                <div class="chest-header" id="chest-header">
+                    <!-- Será preenchido dinamicamente -->
+                </div>
+                <div class="chest-content">
+                    <div class="chest-rewards" id="chest-rewards">
+                        <!-- Recompensas serão renderizadas aqui -->
+                    </div>
+                </div>
+                <button class="btn-primary btn-full" onclick="claimChest()">
+                    REIVINDICAR
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB: JOGO -->
+        <div id="tab-game" class="main-tab">
+            <div id="game-container">
+                <div id="game-topbar">
+                    <button id="game-back-btn" onclick="backToMenu()" class="game-back-btn">← Menu</button>
+                    <div id="game-title-bar"></div>
+                    <div id="game-status-bar"></div>
+                    <div id="game-diff-badge" class="game-diff-badge"></div>
+                    <button id="hack-btn" class="btn-icon hidden" onclick="toggleHackMode()" title="Hack Mode">🔑</button>
+                </div>
+                <div id="hack-display" class="hack-display hidden"></div>
+                <div id="game-boards-area"></div>
+                <div id="keyboard" class="keyboard"></div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== MODAIS ===== -->
+<div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="modal-icon" id="modal-icon"></div>
+        <h2 id="modal-title"></h2>
+        <div id="modal-body"></div>
+        <button id="modal-btn" class="btn-primary btn-full" onclick="closeModal()">CONTINUAR</button>
+    </div>
+</div>
+
+<!-- Modal Loja de Vidas -->
+<div id="shop-overlay" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="modal-icon">🛒</div>
+        <h2>LOJA DE VIDAS</h2>
+        <p id="shop-info"></p>
+        <div id="shop-buttons"></div>
+        <button onclick="closeShop()" class="btn-ghost btn-full" style="margin-top:8px">Continuar sem comprar</button>
+    </div>
+</div>
+
+<!-- Modal Level Up -->
+<div id="levelup-overlay" class="modal-overlay hidden">
+    <div class="modal-box levelup-box">
+        <div class="levelup-burst">⭐</div>
+        <h2 id="levelup-title">SUBIU DE NÍVEL!</h2>
+        <div id="levelup-body"></div>
+        <button onclick="closeLevelUp()" class="btn-primary btn-full">INCRÍVEL!</button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast hidden"></div>
+
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Game Scripts -->
+<script src="supabase-client.js"></script>
+<script src="supabase-sync.js"></script>
+<script src="palavras.js"></script>
+<script src="story_mode/story_data.js"></script>
+<script src="story_mode/story_mode.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+============================================================
+   TERMOPRO - ESTRATÉGIA DE EVOLUÇÃO E MELHORIAS
+============================================================
+
+Para elevar o TermoPro de um protótipo funcional para um jogo de nível profissional, viciante e comercialmente viável, aqui estão as sugestões divididas por pilares:
+
+1. GAME DESIGN E RETENÇÃO (DOPAMINA)
+------------------------------------------------------------
+- Desafios Diários (Daily Word): Uma palavra única por dia para todos os jogadores do mundo, com ranking global diário. Isso cria o hábito de "entrar todo dia".
+- Sequência de Vitórias (Streaks): Recompensas crescentes para quem joga vários dias seguidos (Daily Login Bonus).
+- Sistema de Rankings Globais: Atualmente o ranking é local. Implementar um ranking real onde o jogador se compare com outros usuários (exige backend).
+- Medalhas de Performance: Além dos troféus, medalhas por rapidez (ex: resolver em menos de 30s) ou por eficiência (ex: resolver sem usar letras amarelas).
+
+2. EXPERIÊNCIA DO USUÁRIO (UX/UI) E POLIMENTO
+------------------------------------------------------------
+- Efeitos Sonoros (SFX) Reais: Substituir os bips gerados por código por arquivos de áudio (.mp3) de alta qualidade para cliques, acertos, erros e vitórias.
+- Feedback Háptico: Vibração no celular ao errar uma palavra ou ao acertar uma letra verde.
+- Animações de Partículas: Adicionar explosões de confete ao vencer e efeitos de "glitch" ou trepidação de tela ao enfrentar anomalias no Modo Jornada.
+- Modo Daltônico: Opções para substituir as cores Verde/Amarelo por símbolos ou padrões de alto contraste.
+
+3. CONTEÚDO E VARIEDADE
+------------------------------------------------------------
+- Curadoria do Dicionário: O banco atual tem muitas repetições. É necessário um dicionário limpo, sem palavras obscuras ou duplicatas, focado em palavras conhecidas da língua portuguesa.
+- Dicas Temáticas: Categorias de palavras (Animais, Países, Tecnologia) como modos extras ou eventos temporários.
+- Modo Multiplayer Síncrono: Dois jogadores tentando resolver a mesma palavra ao mesmo tempo; quem terminar primeiro ou com menos tentativas vence.
+
+4. MODO JORNADA (EXPANSÃO)
+------------------------------------------------------------
+- Narrativa Visual: Adicionar diálogos entre as fases com personagens (ex: uma IA assistente ou o vilão "Parasita").
+- Novas Anomalias:
+    - "Espelho": O teclado fica invertido.
+    - "Neblina": Algumas letras do palpite anterior somem após 3 segundos.
+    - "Gravidade": As letras caem para a linha de baixo se não forem confirmadas rápido.
+- Chefes Épicos: Fases com mecânicas de "vida do chefe" que diminui conforme você acerta letras verdes.
+
+5. MONETIZAÇÃO E ECONOMIA
+------------------------------------------------------------
+- Passe de Batalha (Battle Pass): Uma trilha de recompensas gratuitas e premium por temporada.
+- Itens Consumíveis:
+    - "Escudo": Protege contra uma vida perdida no modo Sobrevivência.
+    - "Lupa": Revela uma letra que NÃO existe na palavra (elimina uma cinza).
+    - "Rebobinar": Permite apagar a última linha enviada.
+- Customização Profunda: Skins para as peças (tiles), molduras para o avatar e animações de entrada no jogo.
+
+6. MELHORIAS TÉCNICAS (BACKEND)
+------------------------------------------------------------
+- Sincronização em Nuvem: Permitir que o jogador comece no PC e continue no celular (exige banco de dados como Firebase ou Supabase).
+- Anti-Cheat: Proteção contra manipulação do LocalStorage para ganhar moedas infinitas.
+- Analytics: Rastrear quais fases do Modo Jornada são muito difíceis e onde os jogadores estão desistindo para ajustar o balanceamento.
+
+============================================================
+SUGESTÕES ELABORADAS POR MANUS AI - 15/06/2026
+============================================================

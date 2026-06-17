@@ -1,0 +1,116 @@
+<!-- STORY_MODE.HTML - Interface do Modo História -->
+
+<!-- TAB: MODO HISTÓRIA -->
+<div id="tab-story-mode" class="main-tab">
+    <header class="main-header">
+        <div class="header-logo">📖 <span>JORNADAS</span></div>
+        <div class="header-right">Decodifique as chaves de segurança</div>
+    </header>
+
+    <!-- Seletor de Jornadas -->
+    <div class="story-journey-selector">
+        <button class="journey-btn active" onclick="switchJourney('jornada_1')">
+            <span class="journey-icon">⚡</span>
+            <span class="journey-name">Operação Código Primário</span>
+        </button>
+    </div>
+
+    <!-- Mapa de Jornada -->
+    <div class="story-map-container">
+        <div class="story-map" id="story-map">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Informações do Capítulo -->
+    <div class="chapter-info-panel" id="chapter-info-panel" style="display: none;">
+        <div class="chapter-info-header">
+            <h3 id="chapter-title"></h3>
+            <button class="close-btn" onclick="closeChapterInfo()">×</button>
+        </div>
+        <div class="chapter-info-content">
+            <p id="chapter-description"></p>
+            <div class="chapter-stats">
+                <div class="stat"><span>Estrelas Coletadas:</span> <strong id="chapter-stars">0/30</strong></div>
+                <div class="stat"><span>Progresso:</span> <strong id="chapter-progress">0%</strong></div>
+            </div>
+            <div class="chapter-chests" id="chapter-chests">
+                <!-- Baús serão renderizados aqui -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Briefing da Fase -->
+<div id="story-briefing-modal" class="modal-overlay hidden">
+    <div class="modal-box story-briefing-box">
+        <button class="modal-close-btn" onclick="closeBriefingModal()">×</button>
+        <div class="briefing-header">
+            <div class="briefing-icon" id="briefing-icon">⚙️</div>
+            <h2 id="briefing-title">Fase 1</h2>
+        </div>
+        <div class="briefing-content">
+            <pre id="briefing-text" class="briefing-text"></pre>
+            <div class="briefing-records">
+                <span>Recordes Anteriores:</span>
+                <div class="stars-display" id="briefing-stars">
+                    <span class="star">☆</span>
+                    <span class="star">☆</span>
+                    <span class="star">☆</span>
+                </div>
+            </div>
+        </div>
+        <div class="briefing-actions">
+            <button class="btn-primary btn-full" onclick="startStoryPhase()">
+                INJETAR CÓDIGO DE PURGA
+            </button>
+            <button class="btn-ghost btn-full" onclick="closeBriefingModal()">
+                Voltar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Recompensa de Fase -->
+<div id="story-reward-modal" class="modal-overlay hidden">
+    <div class="modal-box story-reward-box">
+        <div class="reward-header" id="reward-header">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+        <div class="reward-content">
+            <div class="stars-earned" id="stars-earned">
+                <!-- Estrelas serão renderizadas aqui -->
+            </div>
+            <div class="rewards-breakdown">
+                <div class="reward-item">
+                    <span class="reward-label">Moedas</span>
+                    <span class="reward-value" id="reward-coins">+0</span>
+                </div>
+                <div class="reward-item">
+                    <span class="reward-label">XP</span>
+                    <span class="reward-value" id="reward-xp">+0</span>
+                </div>
+            </div>
+        </div>
+        <button class="btn-primary btn-full" onclick="closeRewardModal()">
+            CONTINUAR
+        </button>
+    </div>
+</div>
+
+<!-- Modal de Baú de Capítulo -->
+<div id="story-chest-modal" class="modal-overlay hidden">
+    <div class="modal-box story-chest-box">
+        <div class="chest-header" id="chest-header">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+        <div class="chest-content">
+            <div class="chest-rewards" id="chest-rewards">
+                <!-- Recompensas serão renderizadas aqui -->
+            </div>
+        </div>
+        <button class="btn-primary btn-full" onclick="closeChestModal()">
+            REIVINDICAR
+        </button>
+    </div>
+</div>
