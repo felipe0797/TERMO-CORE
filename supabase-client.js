@@ -3,26 +3,35 @@
  * Inicializa a conexão com Supabase e gerencia autenticação
  */
 
-// Importar a biblioteca Supabase via CDN (já adicionada no index.html)
-// const { createClient } = supabase;
+// Credenciais Supabase (injetadas diretamente)
+const SUPABASE_URL = 'https://tdxygivlneimyorbxzzy.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_LjpRcjeUfTAw0TSxYJhlzQ_dX_jzYVa';
 
 let supabaseClient = null;
+let currentUserSupabaseId = null;
 
 /**
  * Inicializar cliente Supabase
  */
 function initSupabase() {
-    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-    const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        console.error('❌ Variáveis de ambiente Supabase não configuradas');
+    if (!window.supabase) {
+        console.error('❌ Biblioteca Supabase não carregada');
         return null;
     }
 
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('✅ Supabase inicializado');
-    return supabaseClient;
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        console.error('❌ Credenciais Supabase não configuradas');
+        return null;
+    }
+
+    try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase inicializado com sucesso');
+        return supabaseClient;
+    } catch (error) {
+        console.error('❌ Erro ao inicializar Supabase:', error);
+        return null;
+    }
 }
 
 /**
@@ -38,11 +47,16 @@ function getSupabaseClient() {
 /**
  * Registrar novo usuário
  */
-async function registerUser(email, password, username) {
+async function registerUser(email, password) {
     const client = getSupabaseClient();
-    if (!client) return { error: 'Supabase não inicializado' };
+    if (!client) {
+        console.error('❌ Supabase não inicializado');
+        return { error: 'Supabase não inicializado' };
+    }
 
     try {
+        console.log('📝 Registrando usuário:', email);
+        
         // Registrar no Supabase Auth
         const { data: authData, error: authError } = await client.auth.signUp({
             email,
@@ -50,118 +64,137 @@ async function registerUser(email, password, username) {
         });
 
         if (authError) {
-            console.error('Erro ao registrar:', authError);
+            console.error('❌ Erro de autenticação:', authError);
             return { error: authError.message };
         }
 
-        // Criar perfil do usuário na tabela users
-        const { data: userData, error: userError } = await client
-            .from('users')
-            .insert([
-                {
-                    id: authData.user.id,
-                    email,
-                    username
-                }
-            ]);
-
-        if (userError) {
-            console.error('Erro ao criar perfil:', userError);
-            return { error: userError.message };
+        if (!authData.user) {
+            console.error('❌ Usuário não criado');
+            return { error: 'Falha ao criar usuário' };
         }
 
-        // Criar estatísticas iniciais
+        console.log('✅ Usuário registrado:', authData.user.id);
+        currentUserSupabaseId = authData.user.id;
+
+        // Criar perfil na tabela users
+        const { error: profileError } = await client
+            .from('users')
+            .insert({
+                id: authData.user.id,
+                email: email,
+                username: email.split('@')[0]
+            });
+
+        if (profileError) {
+            console.error('❌ Erro ao criar perfil:', profileError);
+            return { error: profileError.message };
+        }
+
+        // Criar stats iniciais
         const { error: statsError } = await client
             .from('game_stats')
-            .insert([
-                {
-                    user_id: authData.user.id,
-                    xp: 0,
-                    coins: 0
-                }
-            ]);
+            .insert({
+                user_id: authData.user.id,
+                xp: 0,
+                coins: 0
+            });
 
         if (statsError) {
-            console.error('Erro ao criar estatísticas:', statsError);
-            return { error: statsError.message };
+            console.error('❌ Erro ao criar stats:', statsError);
         }
 
         return { success: true, user: authData.user };
     } catch (error) {
-        console.error('Erro inesperado no registro:', error);
+        console.error('❌ Erro ao registrar:', error);
         return { error: error.message };
     }
 }
 
 /**
- * Login de usuário
+ * Fazer login
  */
 async function loginUser(email, password) {
     const client = getSupabaseClient();
-    if (!client) return { error: 'Supabase não inicializado' };
+    if (!client) {
+        console.error('❌ Supabase não inicializado');
+        return { error: 'Supabase não inicializado' };
+    }
 
     try {
-        const { data, error } = await client.auth.signInWithPassword({
+        console.log('🔐 Fazendo login:', email);
+        
+        const { data: authData, error: authError } = await client.auth.signInWithPassword({
             email,
             password
         });
 
-        if (error) {
-            console.error('Erro ao fazer login:', error);
-            return { error: error.message };
+        if (authError) {
+            console.error('❌ Erro de login:', authError);
+            return { error: authError.message };
         }
 
-        return { success: true, user: data.user };
+        if (!authData.user) {
+            console.error('❌ Usuário não autenticado');
+            return { error: 'Falha ao fazer login' };
+        }
+
+        console.log('✅ Login bem-sucedido:', authData.user.id);
+        currentUserSupabaseId = authData.user.id;
+
+        return { success: true, user: authData.user };
     } catch (error) {
-        console.error('Erro inesperado no login:', error);
+        console.error('❌ Erro ao fazer login:', error);
         return { error: error.message };
     }
 }
 
 /**
- * Logout de usuário
+ * Fazer logout
  */
 async function logoutUser() {
     const client = getSupabaseClient();
-    if (!client) return { error: 'Supabase não inicializado' };
+    if (!client) return;
 
     try {
-        const { error } = await client.auth.signOut();
-
-        if (error) {
-            console.error('Erro ao fazer logout:', error);
-            return { error: error.message };
-        }
-
-        return { success: true };
+        await client.auth.signOut();
+        currentUserSupabaseId = null;
+        console.log('✅ Logout realizado');
     } catch (error) {
-        console.error('Erro inesperado no logout:', error);
-        return { error: error.message };
+        console.error('❌ Erro ao fazer logout:', error);
     }
 }
 
 /**
- * Obter usuário atualmente autenticado
+ * Obter usuário atual
  */
 async function getCurrentUser() {
     const client = getSupabaseClient();
     if (!client) return null;
 
     try {
-        const { data: { user } } = await client.auth.getUser();
-        return user;
+        const { data: { session } } = await client.auth.getSession();
+        if (session?.user) {
+            currentUserSupabaseId = session.user.id;
+            console.log('✅ Usuário atual:', session.user.id);
+            return session.user;
+        }
+        return null;
     } catch (error) {
-        console.error('Erro ao obter usuário:', error);
+        console.error('❌ Erro ao obter usuário:', error);
         return null;
     }
 }
 
 /**
- * Verificar se usuário está autenticado
+ * Verificar sessão ativa (alias para getCurrentUser)
  */
-async function isUserAuthenticated() {
-    const user = await getCurrentUser();
-    return user !== null;
+async function checkSession() {
+    return await getCurrentUser();
 }
 
-console.log('✅ supabase-client.js carregado');
+// Inicializar Supabase quando a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Inicializando Supabase...');
+    initSupabase();
+    checkSession();
+});
