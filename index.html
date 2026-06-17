@@ -23,12 +23,12 @@
 
         <div id="login-form" class="auth-form">
             <div class="input-group">
-                <label>USUÁRIO</label>
-                <input type="text" id="auth-user" placeholder="seu usuário" maxlength="15" autocomplete="off">
+                <label>EMAIL</label>
+                <input type="email" id="auth-user" placeholder="seu@email.com" maxlength="255" autocomplete="email">
             </div>
             <div class="input-group">
-                <label>PIN</label>
-                <input type="password" id="auth-pin" placeholder="4 dígitos" maxlength="4" inputmode="numeric">
+                <label>SENHA</label>
+                <input type="password" id="auth-pin" placeholder="mínimo 6 caracteres" maxlength="255" autocomplete="current-password">
             </div>
             <button onclick="handleAuth()" class="btn-primary btn-full">ENTRAR</button>
             <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Criar conta</button>
@@ -36,16 +36,16 @@
 
         <div id="register-form" class="auth-form hidden">
             <div class="input-group">
-                <label>NOVO USUÁRIO</label>
-                <input type="text" id="reg-user" placeholder="escolha um nome" maxlength="15" autocomplete="off">
+                <label>EMAIL</label>
+                <input type="email" id="reg-user" placeholder="seu@email.com" maxlength="255" autocomplete="email">
             </div>
             <div class="input-group">
-                <label>PIN</label>
-                <input type="password" id="reg-pin" placeholder="4 dígitos" maxlength="4" inputmode="numeric">
+                <label>SENHA</label>
+                <input type="password" id="reg-pin" placeholder="mínimo 6 caracteres" maxlength="255" autocomplete="new-password">
             </div>
             <div class="input-group">
-                <label>CONFIRMAR PIN</label>
-                <input type="password" id="reg-pin-confirm" placeholder="repita o PIN" maxlength="4" inputmode="numeric">
+                <label>CONFIRMAR SENHA</label>
+                <input type="password" id="reg-pin-confirm" placeholder="repita a senha" maxlength="255" autocomplete="new-password">
             </div>
             <button onclick="handleRegister()" class="btn-primary btn-full">CADASTRAR</button>
             <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Voltar ao login</button>
