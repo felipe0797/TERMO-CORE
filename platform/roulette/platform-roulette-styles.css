@@ -1,0 +1,398 @@
+/**
+ * PLATFORM ROULETTE STYLES - Core Games Platform
+ * Estilos para a roleta da plataforma
+ */
+
+/* ============================================================
+   ROULETTE CONTAINER
+   ============================================================ */
+.roulette-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   ROULETTE HEADER
+   ============================================================ */
+.roulette-header {
+    text-align: center;
+}
+
+.roulette-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.roulette-description {
+    font-size: 14px;
+    color: #a0a0a0;
+    margin: 0;
+}
+
+/* ============================================================
+   TICKETS INFO
+   ============================================================ */
+.tickets-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.tickets-icon {
+    font-size: 20px;
+}
+
+.tickets-text {
+    color: #e0e0e0;
+}
+
+.tickets-text strong {
+    color: #6366f1;
+}
+
+/* ============================================================
+   ROULETTE WHEEL
+   ============================================================ */
+.roulette-wheel-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.roulette-pointer {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid #6366f1;
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.roulette-wheel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        #6366f1 0deg 45deg,
+        #8b5cf6 45deg 90deg,
+        #a78bfa 90deg 135deg,
+        #c4b5fd 135deg 180deg,
+        #ddd6fe 180deg 225deg,
+        #ede9fe 225deg 270deg,
+        #f3e8ff 270deg 315deg,
+        #fae8ff 315deg 360deg
+    );
+    border: 3px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.2), inset 0 0 40px rgba(0, 0, 0, 0.2);
+    transition: transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wheel-segment {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.segment-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: absolute;
+    top: 20px;
+    font-weight: 700;
+    text-align: center;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.segment-emoji {
+    font-size: 24px;
+}
+
+.segment-label {
+    font-size: 10px;
+    max-width: 60px;
+    line-height: 1.2;
+}
+
+/* ============================================================
+   SPIN BUTTON
+   ============================================================ */
+.spin-button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-spin {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+}
+
+.btn-spin:hover:not(:disabled) {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
+}
+
+.btn-spin:active:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.btn-spin:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   REWARDS SECTION
+   ============================================================ */
+.rewards-section,
+.last-spins-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rewards-section h3,
+.last-spins-section h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.rewards-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.reward-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.reward-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.reward-emoji {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.reward-text {
+    font-size: 12px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.reward-chance {
+    font-size: 11px;
+    color: #888;
+    font-weight: 700;
+    background: rgba(99, 102, 241, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* ============================================================
+   LAST SPINS
+   ============================================================ */
+.last-spins-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.last-spins-list .loading {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .roulette-container {
+        gap: 24px;
+        padding: 16px;
+    }
+
+    .roulette-header h2 {
+        font-size: 24px;
+    }
+
+    .roulette-wheel-container {
+        max-width: 300px;
+    }
+
+    .roulette-pointer {
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 20px solid #6366f1;
+    }
+
+    .segment-emoji {
+        font-size: 20px;
+    }
+
+    .segment-label {
+        font-size: 9px;
+    }
+
+    .btn-spin {
+        padding: 12px 32px;
+        font-size: 14px;
+    }
+
+    .rewards-list {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 10px;
+    }
+
+    .reward-item {
+        padding: 10px;
+    }
+
+    .reward-emoji {
+        font-size: 20px;
+    }
+
+    .reward-text {
+        font-size: 11px;
+    }
+
+    .reward-chance {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .roulette-container {
+        gap: 16px;
+        padding: 12px;
+    }
+
+    .roulette-header h2 {
+        font-size: 20px;
+    }
+
+    .roulette-description {
+        font-size: 12px;
+    }
+
+    .tickets-info {
+        font-size: 12px;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+
+    .tickets-icon {
+        font-size: 18px;
+    }
+
+    .roulette-wheel-container {
+        max-width: 250px;
+    }
+
+    .roulette-pointer {
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 18px solid #6366f1;
+        top: -15px;
+    }
+
+    .segment-emoji {
+        font-size: 18px;
+    }
+
+    .segment-label {
+        font-size: 8px;
+    }
+
+    .btn-spin {
+        padding: 10px 24px;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+
+    .rewards-section h3,
+    .last-spins-section h3 {
+        font-size: 14px;
+    }
+
+    .rewards-list {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .reward-item {
+        padding: 8px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .reward-emoji {
+        font-size: 18px;
+    }
+
+    .reward-text {
+        font-size: 10px;
+    }
+
+    .reward-chance {
+        font-size: 9px;
+    }
+}

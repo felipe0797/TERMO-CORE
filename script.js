@@ -1,5 +1,5 @@
 /**
- * CORE GAMES PLATFORM - Main Script
+ * CORE GAMES PLATFORM - Main Script v2.1.0
  * Inicializa a plataforma e gerencia o fluxo principal
  */
 
@@ -7,7 +7,7 @@
 // INICIALIZAÇÃO
 // ============================================================
 window.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Iniciando Core Games Platform v2.0.0');
+    console.log('🚀 Iniciando Core Games Platform v2.1.0');
     
     try {
         // Inicializar Supabase
@@ -53,7 +53,7 @@ window.addEventListener('focus', async () => {
         
         if (user) {
             // Recarregar Game Selector
-            console.log('🔄 Retornando do jogo');
+            console.log('🔄 Retornando do jogo:', currentGame);
             showScreen('screen-games-selector');
             await gameSelector.renderGameSelector();
         } else {
@@ -105,6 +105,6 @@ window.addEventListener('beforeunload', (event) => {
 // ============================================================
 // LOGS
 // ============================================================
-console.log('✅ Core Games Platform v2.0.0 carregado');
+console.log('✅ Core Games Platform v2.1.0 carregado');
 console.log('📍 Ambiente:', window.location.hostname);
 console.log('🎮 Jogos disponíveis:', GAMES_CATALOG.length);
