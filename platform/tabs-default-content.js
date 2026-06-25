@@ -207,6 +207,7 @@ function initializeDefaultContent() {
     try {
         console.log('📝 Renderizando conteúdo padrão das abas...');
         
+        renderGameSelector();
         renderDefaultProfile();
         renderDefaultSocial();
         renderDefaultAchievements();
@@ -216,5 +217,70 @@ function initializeDefaultContent() {
         console.log('✅ Conteúdo padrão renderizado com sucesso');
     } catch (error) {
         console.error('❌ Erro ao renderizar conteúdo padrão:', error);
+    }
+}
+
+// ============================================================
+// RENDERIZAR GAME SELECTOR
+// ============================================================
+function renderGameSelector() {
+    const container = document.querySelector('[data-tab="games"]');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div style="padding: 20px;">
+            <div style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 100, 200, 0.1) 100%); padding: 24px; border-radius: 12px; border: 1px solid rgba(0, 212, 255, 0.2);">
+                <div style="font-weight: 700; color: #00d4ff; margin-bottom: 20px; font-size: 18px;">🎮 Selecione um Jogo</div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <!-- Card TermoCore -->
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 2px solid #00d4ff; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 30px rgba(0, 212, 255, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        <div style="background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); padding: 20px; text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">🎮</div>
+                            <div style="color: #000; font-weight: 700; font-size: 18px;">TERMOCORE</div>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div style="color: #a0aec0; font-size: 14px; margin-bottom: 12px;">Adivinhe palavras em português com 5 ou 7 letras</div>
+                            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                <span style="background: rgba(0, 212, 255, 0.2); color: #00d4ff; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Puzzle</span>
+                                <span style="background: rgba(0, 212, 255, 0.2); color: #00d4ff; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Palavras</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <span style="color: #a0aec0; font-size: 12px;">⭐ 4.8 (1.2K)</span>
+                                <span style="color: #a0aec0; font-size: 12px;">👥 5.3K jogadores</span>
+                            </div>
+                            <button onclick="playGame('termocore')" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #000; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                ▶️ JOGAR AGORA
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card Coming Soon -->
+                    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 12px; overflow: hidden; opacity: 0.6;">
+                        <div style="background: linear-gradient(135deg, #666 0%, #444 100%); padding: 20px; text-align: center;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
+                            <div style="color: #999; font-weight: 700; font-size: 18px;">EM BREVE</div>
+                        </div>
+                        <div style="padding: 20px;">
+                            <div style="color: #666; font-size: 14px; margin-bottom: 12px;">Novos jogos em desenvolvimento</div>
+                            <div style="text-align: center; color: #666; font-size: 12px;">Volte em breve para mais diversão!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+// JOGAR JOGO
+// ============================================================
+function playGame(gameName) {
+    if (gameName === 'termocore') {
+        // Marcar que veio da plataforma
+        localStorage.setItem('cg_current_game', 'termocore');
+        
+        // Redirecionar para o jogo
+        window.location.href = './games/termocore/';
     }
 }

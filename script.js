@@ -416,14 +416,15 @@ function showToast(message, type = 'info') {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 16px 24px;
+            padding: 12px 16px;
             background: ${bgColor};
             color: white;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
+            font-size: 13px;
             z-index: 9999;
-            max-width: 300px;
-            max-height: 100px;
+            max-width: 280px;
+            max-height: 50px;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -493,6 +494,26 @@ style.textContent = `
     #main-content {
         padding: 20px;
         max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    #screen-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+
+    #screen-login .login-container {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    #screen-login .auth-container {
+        width: 100%;
+        max-width: 400px;
         margin: 0 auto;
     }
 
