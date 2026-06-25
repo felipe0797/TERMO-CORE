@@ -130,26 +130,31 @@ async function handleRegister() {
 }
 
 async function handleGuestLogin() {
-    const result = await loginAsGuest();
-    if (result.success) {
-        currentUserSupabaseId = result.userId;
-        isGuest = true;
-        await loadUserStats();
+    try {
+        const result = await loginAsGuest();
+        if (result && result.success) {
+            currentUserSupabaseId = result.userId;
+            isGuest = true;
+            await loadUserStats();
 
-        // Sincronizar com localStorage para TermoCore
-        localStorage.setItem('cg_auth_token', result.token || 'guest');
-        localStorage.setItem('cg_current_user', JSON.stringify({
-            id: result.userId,
-            email: 'visitante@termocore.local',
-            username: 'Visitante',
-            is_guest: true
-        }));
+            // Sincronizar com localStorage para TermoCore
+            localStorage.setItem('cg_auth_token', result.token || 'guest');
+            localStorage.setItem('cg_current_user', JSON.stringify({
+                id: result.userId,
+                email: 'visitante@termocore.local',
+                username: 'Visitante',
+                is_guest: true
+            }));
 
-        showScreen('main');
-        await initializePlatform();
-        showToast('✅ Bem-vindo, visitante!', 'success');
-    } else {
-        showToast(result.error || 'Erro ao entrar como visitante', 'error');
+            showScreen('main');
+            await initializePlatform();
+            showToast('✅ Bem-vindo, visitante!', 'success');
+        } else {
+            showToast(result?.error || 'Erro ao entrar como visitante', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao fazer login como visitante:', error);
+        showToast('Erro ao entrar como visitante', 'error');
     }
 }
 
@@ -227,6 +232,11 @@ async function initializePlatform() {
 
         // Renderizar todas as abas
         await renderAllTabs();
+        
+        // Inicializar conteúdo padrão
+        if (typeof initializeDefaultContent === 'function') {
+            initializeDefaultContent();
+        }
 
         // Anexar event listeners
         attachTabListeners();

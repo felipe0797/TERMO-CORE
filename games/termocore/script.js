@@ -30,6 +30,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const platformCurrentUser = localStorage.getItem('cg_current_user');
     
     let user = null;
+    let fromPlatform = false;
     
     if (platformAuthToken && platformCurrentUser) {
         // Usuário veio da plataforma - usar sessão compartilhada
@@ -40,6 +41,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             currentUser = userData.email;
             isGuest = userData.is_guest || false;
             user = userData;
+            fromPlatform = true;
         } catch (e) {
             console.error('❌ Erro ao sincronizar com plataforma:', e);
         }
@@ -49,7 +51,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Verificar se usuário está autenticado
-    if (user) {
+    if (user && (fromPlatform || user.id)) {
         currentUser = user.email;
         currentUserSupabaseId = user.id;
         const stats = await loadUserStatsFromSupabase(user.id);
