@@ -10,31 +10,113 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Styles -->
+    <!-- Styles - Shared -->
     <link rel="stylesheet" href="shared/styles-shared.css">
-    <link rel="stylesheet" href="platform/auth/auth-styles.css">
-    <link rel="stylesheet" href="platform/games-selector/game-selector.css">
+    
+    <!-- Styles - Auth -->
+    <link rel="stylesheet" href="platform/auth/unified-auth-styles.css">
+    
+    <!-- Styles - Profile -->
+    <link rel="stylesheet" href="platform/profile/global-profile-styles.css">
+    
+    <!-- Styles - Social -->
+    <link rel="stylesheet" href="platform/social/global-social-styles.css">
+    
+    <!-- Styles - Achievements -->
+    <link rel="stylesheet" href="platform/achievements/global-achievements-styles.css">
+    
+    <!-- Styles - Shop -->
+    <link rel="stylesheet" href="platform/shop/universal-shop-styles.css">
+    
+    <!-- Styles - Roulette -->
+    <link rel="stylesheet" href="platform/roulette/platform-roulette-styles.css">
+    
+    <!-- Styles - Games Selector -->
+    <link rel="stylesheet" href="platform/games-selector/game-selector-styles.css">
+    
+    <!-- Styles - Platform -->
     <link rel="stylesheet" href="platform/platform-styles.css">
 </head>
 <body>
     <!-- ===== TELA DE LOGIN ===== -->
-    <div id="screen-login" class="screen active"></div>
+    <div id="screen-login" class="screen active">
+        <div id="auth-container"></div>
+    </div>
 
-    <!-- ===== TELA DE GAME SELECTOR ===== -->
-    <div id="screen-games-selector" class="screen"></div>
+    <!-- ===== TELA AUTENTICADA ===== -->
+    <div id="screen-authenticated" class="screen">
+        <!-- Header com Navegação -->
+        <div id="platform-header"></div>
+
+        <!-- Main Content com Abas -->
+        <main id="main-content">
+            <!-- Aba: Jogos -->
+            <div data-tab="games" class="tab-content active">
+                <div id="games-selector-container"></div>
+            </div>
+
+            <!-- Aba: Perfil -->
+            <div data-tab="profile" class="tab-content">
+                <div id="profile-container"></div>
+            </div>
+
+            <!-- Aba: Social -->
+            <div data-tab="social" class="tab-content">
+                <div id="social-container"></div>
+            </div>
+
+            <!-- Aba: Conquistas -->
+            <div data-tab="achievements" class="tab-content">
+                <div id="achievements-container"></div>
+            </div>
+
+            <!-- Aba: Loja -->
+            <div data-tab="shop" class="tab-content">
+                <div id="shop-container"></div>
+            </div>
+
+            <!-- Aba: Roleta -->
+            <div data-tab="roulette" class="tab-content">
+                <div id="roulette-container"></div>
+            </div>
+        </main>
+    </div>
 
     <!-- ===== SCRIPTS ===== -->
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="supabase-client.js"></script>
     
     <!-- Shared -->
     <script src="shared/constants.js"></script>
     <script src="shared/utils.js"></script>
     
-    <!-- Platform -->
-    <script src="platform/auth/auth-manager.js"></script>
-    <script src="platform/auth/auth-ui.js"></script>
-    <script src="platform/games-selector/game-selector.js"></script>
+    <!-- Auth -->
+    <script src="platform/auth/unified-auth-manager.js"></script>
+    <script src="platform/auth/unified-auth-ui.js"></script>
+    
+    <!-- Profile -->
+    <script src="platform/profile/global-profile-manager.js"></script>
+    <script src="platform/profile/global-profile-ui.js"></script>
+    
+    <!-- Social -->
+    <script src="platform/social/global-social-manager.js"></script>
+    <script src="platform/social/global-social-ui.js"></script>
+    
+    <!-- Achievements -->
+    <script src="platform/achievements/global-achievements-manager.js"></script>
+    <script src="platform/achievements/global-achievements-ui.js"></script>
+    
+    <!-- Shop -->
+    <script src="platform/shop/universal-shop-manager.js"></script>
+    <script src="platform/shop/universal-shop-ui.js"></script>
+    
+    <!-- Roulette -->
+    <script src="platform/roulette/platform-roulette-manager.js"></script>
+    <script src="platform/roulette/platform-roulette-ui.js"></script>
+    
+    <!-- Games Selector -->
+    <script src="platform/games-selector/game-selector-ui.js"></script>
     
     <!-- Main Platform Script -->
     <script src="script.js"></script>

@@ -24,8 +24,31 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Inicializar Supabase
     initSupabase();
     
-    // Verificar se usuário já está autenticado (sessão persistida)
-    const user = await getCurrentUser();
+    // ===== SINCRONIZAÇÃO COM PLATAFORMA =====
+    // Verificar se veio da plataforma com autenticação
+    const platformAuthToken = localStorage.getItem('cg_auth_token');
+    const platformCurrentUser = localStorage.getItem('cg_current_user');
+    
+    let user = null;
+    
+    if (platformAuthToken && platformCurrentUser) {
+        // Usuário veio da plataforma - usar sessão compartilhada
+        console.log('✅ Sincronizando com autenticação da plataforma');
+        try {
+            const userData = JSON.parse(platformCurrentUser);
+            currentUserSupabaseId = userData.id;
+            currentUser = userData.email;
+            isGuest = userData.is_guest || false;
+            user = userData;
+        } catch (e) {
+            console.error('❌ Erro ao sincronizar com plataforma:', e);
+        }
+    } else {
+        // Verificar se usuário já está autenticado (sessão persistida)
+        user = await getCurrentUser();
+    }
+    
+    // Verificar se usuário está autenticado
     if (user) {
         currentUser = user.email;
         currentUserSupabaseId = user.id;
@@ -4402,4 +4425,225 @@ function returnToPlatform() {
             window.location.href = '../..';
         });
     }
+}
+
+// ============================================================
+// RETORNO À PLATAFORMA COM MODAL BONITO
+// ============================================================
+function returnToPlatform() {
+    // Salvar stats antes de sair
+    saveUserStats();
+    
+    // Criar modal de retorno
+    const modal = document.createElement('div');
+    modal.className = 'return-platform-modal-overlay';
+    modal.innerHTML = `
+        <div class="return-platform-modal-card">
+            <div class="return-platform-header">
+                <h2>Voltar à Plataforma?</h2>
+                <p>Seus progresso foi salvo automaticamente</p>
+            </div>
+            
+            <div class="return-platform-content">
+                <div class="return-platform-icon">🎮</div>
+                <p>Você será redirecionado para a biblioteca de jogos Core Games</p>
+                <div class="return-platform-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Nível</span>
+                        <span class="stat-value">${getLevelInfo(userStats.xp || 0).level}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Moedas</span>
+                        <span class="stat-value">${userStats.coins || 0}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Vitórias</span>
+                        <span class="stat-value">${(userStats['5_LETTERS']?.wins || 0) + (userStats['7_LETTERS']?.wins || 0)}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="return-platform-actions">
+                <button class="btn-return-cancel" onclick="this.closest('.return-platform-modal-overlay').remove()">
+                    Continuar Jogando
+                </button>
+                <button class="btn-return-confirm" onclick="confirmReturnToPlatform()">
+                    Voltar à Plataforma
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Adicionar estilos do modal
+    if (!document.getElementById('return-platform-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'return-platform-styles';
+        styles.textContent = `
+            .return-platform-modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeInOverlay 0.3s ease;
+            }
+            
+            @keyframes fadeInOverlay {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            .return-platform-modal-card {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border: 2px solid #00d4ff;
+                border-radius: 16px;
+                padding: 32px;
+                max-width: 400px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+                animation: slideUpModal 0.4s ease;
+            }
+            
+            @keyframes slideUpModal {
+                from {
+                    transform: translateY(50px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            .return-platform-header {
+                text-align: center;
+                margin-bottom: 24px;
+            }
+            
+            .return-platform-header h2 {
+                color: #00d4ff;
+                font-size: 24px;
+                margin: 0 0 8px 0;
+                font-weight: 700;
+            }
+            
+            .return-platform-header p {
+                color: #a0aec0;
+                font-size: 14px;
+                margin: 0;
+            }
+            
+            .return-platform-content {
+                text-align: center;
+                margin-bottom: 32px;
+            }
+            
+            .return-platform-icon {
+                font-size: 48px;
+                margin-bottom: 16px;
+                animation: bounce 2s infinite;
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            
+            .return-platform-content p {
+                color: #cbd5e0;
+                font-size: 14px;
+                margin: 0 0 20px 0;
+            }
+            
+            .return-platform-stats {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+            
+            .stat-item {
+                background: rgba(0, 212, 255, 0.1);
+                border: 1px solid rgba(0, 212, 255, 0.3);
+                border-radius: 8px;
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-label {
+                color: #a0aec0;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                margin-bottom: 4px;
+            }
+            
+            .stat-value {
+                color: #00d4ff;
+                font-size: 18px;
+                font-weight: 700;
+            }
+            
+            .return-platform-actions {
+                display: flex;
+                gap: 12px;
+                flex-direction: column;
+            }
+            
+            .btn-return-cancel,
+            .btn-return-confirm {
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+            }
+            
+            .btn-return-cancel {
+                background: rgba(255, 255, 255, 0.1);
+                color: #cbd5e0;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            
+            .btn-return-cancel:hover {
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+            
+            .btn-return-confirm {
+                background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+                color: #000;
+                font-weight: 700;
+            }
+            
+            .btn-return-confirm:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            }
+            
+            .btn-return-confirm:active {
+                transform: translateY(0);
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    document.body.appendChild(modal);
+}
+
+function confirmReturnToPlatform() {
+    // Limpar localStorage
+    localStorage.removeItem('cg_current_game');
+    
+    // Redirecionar
+    window.location.href = '../..';
 }
