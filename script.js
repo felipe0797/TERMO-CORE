@@ -1,58 +1,82 @@
 /**
  * CORE GAMES PLATFORM - Main Script v2.1.0
- * Usa o sistema de login do TermoCore + Plataforma com abas
+ * Gerencia autenticação e abas da plataforma
  */
 
 // ============================================================
 // VARIÁVEIS GLOBAIS
 // ============================================================
 let currentUserSupabaseId = null;
-let isGuest = false;
 let userStats = {};
-let authMode = 'login';
 
 // ============================================================
 // INICIALIZAÇÃO
 // ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('load', async () => {
     console.log('🚀 Iniciando Core Games Platform v2.1.0');
 
     try {
-        // Inicializar Supabase
-        initSupabase();
+        // Aguardar um pouco para o TermoCore carregar
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Verificar se já está autenticado
-        const user = await getCurrentUser();
-        if (user) {
-            currentUserSupabaseId = user.id;
-            await loadUserStats();
-            showScreen('main');
-            await initializePlatform();
+        // Verificar se o TermoCore já fez login
+        const platformUser = localStorage.getItem('cg_current_user');
+        
+        if (platformUser) {
+            try {
+                const userData = JSON.parse(platformUser);
+                currentUserSupabaseId = userData.id;
+                console.log('✅ Usuário autenticado:', userData.username);
+                
+                // Mostrar tela principal
+                showScreen('main');
+                
+                // Inicializar plataforma
+                await initializePlatform();
+            } catch (e) {
+                console.error('❌ Erro ao parsear usuário:', e);
+            }
         } else {
-            showScreen('login');
+            console.log('⏳ Aguardando autenticação...');
         }
     } catch (error) {
-        console.error('❌ Erro ao inicializar:', error);
-        showScreen('login');
+        console.error('❌ Erro ao inicializar plataforma:', error);
     }
 });
 
 // ============================================================
-// MOSTRAR/OCULTAR TELAS
+// MONITORAR MUDANÇAS DE AUTENTICAÇÃO
 // ============================================================
-function showScreen(screenName) {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-    const screen = document.getElementById(`screen-${screenName}`);
-    if (screen) {
-        screen.classList.add('active');
+const authCheckInterval = setInterval(async () => {
+    const platformUser = localStorage.getItem('cg_current_user');
+    
+    if (platformUser && !currentUserSupabaseId) {
+        try {
+            const userData = JSON.parse(platformUser);
+            currentUserSupabaseId = userData.id;
+            console.log('✅ Usuário autenticado (monitoramento):', userData.username);
+            
+            // Mostrar tela principal
+            showScreen('main');
+            
+            // Inicializar plataforma
+            await initializePlatform();
+            
+            // Parar de monitorar
+            clearInterval(authCheckInterval);
+        } catch (e) {
+            console.error('❌ Erro ao parsear usuário:', e);
+        }
     }
-}
+}, 500);
 
 // ============================================================
-// AUTENTICAÇÃO (Do TermoCore)
+// FUNÇÕES DE AUTENTICAÇÃO
 // ============================================================
+
+/**
+ * Login com Email/Usuário e Senha
+ */
 async function handleAuth() {
     const userInput = document.getElementById('auth-user').value.trim();
     const password = document.getElementById('auth-pin').value;
@@ -62,161 +86,155 @@ async function handleAuth() {
         return;
     }
 
-    const result = await loginUser(userInput, password);
-    if (result.success) {
-        currentUserSupabaseId = result.userId;
-        isGuest = false;
-        await loadUserStats();
-        
-        // Sincronizar com localStorage para TermoCore
-        localStorage.setItem('cg_auth_token', result.token || 'authenticated');
-        localStorage.setItem('cg_current_user', JSON.stringify({
-            id: result.userId,
-            email: result.email,
-            username: result.username,
-            is_guest: false
-        }));
+    try {
+        const result = await loginUser(userInput, password);
+        if (result.success) {
+            // Sincronizar com localStorage
+            localStorage.setItem('cg_auth_token', result.token || 'authenticated');
+            localStorage.setItem('cg_current_user', JSON.stringify({
+                id: result.userId,
+                email: result.email,
+                username: result.username,
+                is_guest: false
+            }));
 
-        showScreen('main');
-        await initializePlatform();
-        showToast('✅ Login realizado com sucesso!', 'success');
-    } else {
-        showToast(result.error || 'Erro ao fazer login', 'error');
+            showToast('✅ Login realizado com sucesso!', 'success');
+            
+            // Aguardar um pouco e recarregar
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showToast(result.message || 'Erro ao fazer login', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao fazer login:', error);
+        showToast('Erro ao fazer login', 'error');
     }
 }
 
+/**
+ * Criar nova conta
+ */
 async function handleRegister() {
     const email = document.getElementById('reg-user').value.trim();
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-pin').value;
-    const passwordConfirm = document.getElementById('reg-pin-confirm').value;
+    const confirmPassword = document.getElementById('reg-pin-confirm').value;
 
-    if (!email || !username || !password || !passwordConfirm) {
+    if (!email || !username || !password || !confirmPassword) {
         showToast('Preencha todos os campos', 'error');
         return;
     }
 
-    if (password !== passwordConfirm) {
-        showToast('As senhas não correspondem', 'error');
+    if (password !== confirmPassword) {
+        showToast('As senhas não coincidem', 'error');
         return;
     }
 
     if (password.length < 6) {
-        showToast('Senha deve ter no mínimo 6 caracteres', 'error');
+        showToast('A senha deve ter no mínimo 6 caracteres', 'error');
         return;
     }
 
-    const result = await registerUser(email, password, username, false);
-    if (result.success) {
-        currentUserSupabaseId = result.userId;
-        isGuest = false;
-        await loadUserStats();
-
-        // Sincronizar com localStorage para TermoCore
-        localStorage.setItem('cg_auth_token', result.token || 'authenticated');
-        localStorage.setItem('cg_current_user', JSON.stringify({
-            id: result.userId,
-            email: email,
-            username: username,
-            is_guest: false
-        }));
-
-        showScreen('main');
-        await initializePlatform();
-        showToast('✅ Conta criada com sucesso!', 'success');
-    } else {
-        showToast(result.error || 'Erro ao criar conta', 'error');
+    try {
+        const result = await registerUser(email, password, username);
+        if (result.success) {
+            showToast('✅ Conta criada com sucesso! Faça login.', 'success');
+            
+            // Voltar para tela de login
+            toggleAuthMode();
+            
+            // Limpar campos
+            document.getElementById('reg-user').value = '';
+            document.getElementById('reg-username').value = '';
+            document.getElementById('reg-pin').value = '';
+            document.getElementById('reg-pin-confirm').value = '';
+        } else {
+            showToast(result.message || 'Erro ao criar conta', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao criar conta:', error);
+        showToast('Erro ao criar conta', 'error');
     }
 }
 
+/**
+ * Jogar como Visitante
+ */
 async function handleGuestLogin() {
     try {
-        const result = await loginAsGuest();
-        if (result && result.success) {
-            currentUserSupabaseId = result.userId;
-            isGuest = true;
-            await loadUserStats();
-
-            // Sincronizar com localStorage para TermoCore
+        const result = await registerGuestUser();
+        if (result.success) {
+            // Sincronizar com localStorage
             localStorage.setItem('cg_auth_token', result.token || 'guest');
             localStorage.setItem('cg_current_user', JSON.stringify({
                 id: result.userId,
-                email: 'visitante@termocore.local',
-                username: 'Visitante',
+                email: result.email,
+                username: result.username,
                 is_guest: true
             }));
 
-            showScreen('main');
-            await initializePlatform();
             showToast('✅ Bem-vindo, visitante!', 'success');
+            
+            // Aguardar um pouco e recarregar
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
-            showToast(result?.error || 'Erro ao entrar como visitante', 'error');
+            showToast(result.message || 'Erro ao fazer login como visitante', 'error');
         }
     } catch (error) {
-        console.error('Erro ao fazer login como visitante:', error);
-        showToast('Erro ao entrar como visitante', 'error');
+        console.error('❌ Erro ao fazer login como visitante:', error);
+        showToast('Erro ao fazer login como visitante', 'error');
     }
 }
 
+/**
+ * Toggle entre login e registro
+ */
 function toggleAuthMode() {
-    authMode = authMode === 'login' ? 'register' : 'login';
-    document.getElementById('login-form').classList.toggle('hidden');
-    document.getElementById('register-form').classList.toggle('hidden');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    
+    if (loginForm && registerForm) {
+        loginForm.classList.toggle('hidden');
+        registerForm.classList.toggle('hidden');
+    }
 }
 
+/**
+ * Toggle visibilidade de senha
+ */
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);
-    const btn = document.getElementById(`toggle-${inputId}`);
+    if (!input) return;
     
-    if (input.type === 'password') {
-        input.type = 'text';
-        btn.classList.remove('password-hidden');
-    } else {
-        input.type = 'password';
-        btn.classList.add('password-hidden');
+    const type = input.type === 'password' ? 'text' : 'password';
+    input.type = type;
+    
+    // Atualizar ícone do botão
+    const btn = input.parentElement?.querySelector('.toggle-password-btn');
+    if (btn) {
+        btn.classList.toggle('password-hidden');
     }
 }
 
 // ============================================================
-// CARREGAR STATS DO USUÁRIO
+// MOSTRAR/OCULTAR TELAS
 // ============================================================
-async function loadUserStats() {
+function showScreen(screenName) {
     try {
-        const client = getSupabaseClient();
-        if (!client || !currentUserSupabaseId) return;
-
-        const { data, error } = await client
-            .from('game_stats')
-            .select('*')
-            .eq('user_id', currentUserSupabaseId)
-            .maybeSingle();
-
-        if (error) {
-            console.warn('⚠️ Erro ao carregar stats:', error);
-            userStats = getDefaultUserStats();
-        } else if (data) {
-            userStats = data;
-        } else {
-            userStats = getDefaultUserStats();
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        const screen = document.getElementById(`screen-${screenName}`);
+        if (screen) {
+            screen.classList.add('active');
         }
-
-        console.log('✅ Stats carregados:', userStats);
     } catch (error) {
-        console.error('❌ Erro ao carregar stats:', error);
-        userStats = getDefaultUserStats();
+        console.error('❌ Erro ao mudar tela:', error);
     }
-}
-
-function getDefaultUserStats() {
-    return {
-        xp: 0,
-        coins: 0,
-        tickets: 1,
-        totalGames: 0,
-        ownedItems: [],
-        activeCosmetics: {},
-        activeTheme: 'theme_default'
-    };
 }
 
 // ============================================================
@@ -224,18 +242,15 @@ function getDefaultUserStats() {
 // ============================================================
 async function initializePlatform() {
     try {
+        console.log('📱 Inicializando plataforma...');
+
         // Renderizar header
         await renderPlatformHeader();
 
-        // Inicializar todos os managers
-        await initializeAllManagers();
-
-        // Renderizar todas as abas
-        await renderAllTabs();
-        
-        // Inicializar conteúdo padrão
+        // Renderizar conteúdo padrão das abas
         if (typeof initializeDefaultContent === 'function') {
             initializeDefaultContent();
+            console.log('✅ Conteúdo padrão renderizado');
         }
 
         // Anexar event listeners
@@ -255,8 +270,18 @@ async function renderPlatformHeader() {
         const headerDiv = document.getElementById('platform-header');
         if (!headerDiv) return;
 
-        const username = await getUserUsername() || 'Usuário';
-        const level = getLevelInfo(userStats.xp || 0).level;
+        const platformUser = localStorage.getItem('cg_current_user');
+        let username = 'Usuário';
+        let level = 1;
+
+        if (platformUser) {
+            try {
+                const userData = JSON.parse(platformUser);
+                username = userData.username || 'Usuário';
+            } catch (e) {
+                console.error('❌ Erro ao parsear usuário:', e);
+            }
+        }
 
         headerDiv.innerHTML = `
             <div class="platform-header">
@@ -284,90 +309,6 @@ async function renderPlatformHeader() {
         console.log('✅ Header renderizado');
     } catch (error) {
         console.error('❌ Erro ao renderizar header:', error);
-    }
-}
-
-// ============================================================
-// INICIALIZAR TODOS OS MANAGERS
-// ============================================================
-async function initializeAllManagers() {
-    try {
-        const client = getSupabaseClient();
-
-        // Profile
-        if (typeof globalProfileManager !== 'undefined') {
-            await globalProfileManager.init(client);
-            await globalProfileManager.setCurrentUser(currentUserSupabaseId);
-        }
-
-        // Social
-        if (typeof globalSocialManager !== 'undefined') {
-            await globalSocialManager.init(client);
-            await globalSocialManager.setCurrentUser(currentUserSupabaseId);
-        }
-
-        // Achievements
-        if (typeof globalAchievementsManager !== 'undefined') {
-            await globalAchievementsManager.init(client);
-            await globalAchievementsManager.setCurrentUser(currentUserSupabaseId);
-        }
-
-        // Shop
-        if (typeof universalShopManager !== 'undefined') {
-            await universalShopManager.init(client);
-            await universalShopManager.setCurrentUser(currentUserSupabaseId);
-        }
-
-        // Roulette
-        if (typeof platformRouletteManager !== 'undefined') {
-            await platformRouletteManager.init(client);
-            await platformRouletteManager.setCurrentUser(currentUserSupabaseId);
-        }
-
-        console.log('✅ Managers inicializados');
-    } catch (error) {
-        console.error('❌ Erro ao inicializar managers:', error);
-    }
-}
-
-// ============================================================
-// RENDERIZAR TODAS AS ABAS
-// ============================================================
-async function renderAllTabs() {
-    try {
-        // Jogos
-        if (typeof gameSelectorUI !== 'undefined') {
-            await gameSelectorUI.renderGameSelector();
-        }
-
-        // Perfil
-        if (typeof globalProfileUI !== 'undefined') {
-            await globalProfileUI.renderGlobalProfile();
-        }
-
-        // Social
-        if (typeof globalSocialUI !== 'undefined') {
-            await globalSocialUI.renderGlobalSocial();
-        }
-
-        // Conquistas
-        if (typeof globalAchievementsUI !== 'undefined') {
-            await globalAchievementsUI.renderGlobalAchievements();
-        }
-
-        // Loja
-        if (typeof universalShopUI !== 'undefined') {
-            await universalShopUI.renderShop();
-        }
-
-        // Roleta
-        if (typeof platformRouletteUI !== 'undefined') {
-            await platformRouletteUI.renderRoulette();
-        }
-
-        console.log('✅ Abas renderizadas');
-    } catch (error) {
-        console.error('❌ Erro ao renderizar abas:', error);
     }
 }
 
@@ -422,43 +363,11 @@ function attachTabListeners() {
 }
 
 // ============================================================
-// JOGAR JOGO
-// ============================================================
-async function playGame(gameId) {
-    try {
-        if (typeof gameSelectorUI === 'undefined') {
-            showToast('Erro ao iniciar jogo', 'error');
-            return;
-        }
-
-        const game = gameSelectorUI.games.find(g => g.id === gameId);
-        if (!game || game.status !== 'available') {
-            showToast('Jogo não disponível', 'warning');
-            return;
-        }
-
-        // Sincronizar com jogo
-        localStorage.setItem('cg_current_game', gameId);
-
-        // Redirecionar
-        window.location.href = game.path;
-    } catch (error) {
-        console.error('❌ Erro ao jogar:', error);
-        showToast('Erro ao iniciar jogo', 'error');
-    }
-}
-
-// ============================================================
 // LOGOUT
 // ============================================================
 async function handleLogout() {
     if (confirm('Tem certeza que deseja sair?')) {
         try {
-            const client = getSupabaseClient();
-            if (client) {
-                await client.auth.signOut();
-            }
-
             // Limpar localStorage
             localStorage.removeItem('cg_auth_token');
             localStorage.removeItem('cg_current_user');
@@ -466,16 +375,23 @@ async function handleLogout() {
 
             // Limpar variáveis
             currentUserSupabaseId = null;
-            isGuest = false;
             userStats = {};
 
             // Voltar para login
             showScreen('login');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('register-form').classList.add('hidden');
-            authMode = 'login';
+            
+            // Resetar formulários
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            if (loginForm) loginForm.classList.remove('hidden');
+            if (registerForm) registerForm.classList.add('hidden');
 
             showToast('Desconectado com sucesso', 'success');
+            
+            // Recarregar página
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } catch (error) {
             console.error('❌ Erro ao desconectar:', error);
             showToast('Erro ao desconectar', 'error');
@@ -506,6 +422,11 @@ function showToast(message, type = 'info') {
             border-radius: 8px;
             font-weight: 600;
             z-index: 9999;
+            max-width: 300px;
+            max-height: 100px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
             animation: slideIn 0.3s ease;
         `;
 
@@ -518,14 +439,6 @@ function showToast(message, type = 'info') {
     } catch (error) {
         console.error('❌ Erro ao mostrar toast:', error);
     }
-}
-
-function getLevelInfo(xp) {
-    const level = Math.floor(xp / 100) + 1;
-    const xpForLevel = (level - 1) * 100;
-    const xpForNextLevel = level * 100;
-    const progress = ((xp - xpForLevel) / (xpForNextLevel - xpForLevel)) * 100;
-    return { level, progress: Math.min(progress, 100) };
 }
 
 // ============================================================
