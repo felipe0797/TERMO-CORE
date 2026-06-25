@@ -160,7 +160,7 @@ class GameSelectorUI {
             await globalProfileManager.addGamePlayed(gameId);
 
             // Salvar no localStorage
-            localStorage.setItem(STORAGE_KEYS.CURRENT_GAME, gameId);
+            localStorage.setItem('core_games_current_game', gameId);
 
             // Redirecionar para o jogo
             window.location.href = game.path;

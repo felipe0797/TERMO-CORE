@@ -1,0 +1,341 @@
+/**
+ * ESTILOS DAS ABAS DA PLATAFORMA
+ * Estilos para todos os containers das abas
+ */
+
+/* ============================================================
+   CONTAINERS DAS ABAS
+   ============================================================ */
+
+#profile-container,
+#social-container,
+#achievements-container,
+#shop-container,
+#roulette-container,
+#games-selector-container {
+    width: 100%;
+    min-height: 400px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ============================================================
+   ESTILOS GERAIS
+   ============================================================ */
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   CARDS GENÉRICOS
+   ============================================================ */
+
+.card {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: rgba(0, 212, 255, 0.5);
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.15);
+}
+
+/* ============================================================
+   SEÇÕES
+   ============================================================ */
+
+.section-title {
+    color: #00d4ff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 24px 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+}
+
+.section-subtitle {
+    color: #a0aec0;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+/* ============================================================
+   GRIDS
+   ============================================================ */
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.grid-4 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+.btn-primary,
+.btn-secondary,
+.btn-ghost {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+    color: #000;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 212, 255, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: rgba(0, 212, 255, 0.5);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: #cbd5e0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+.input-field {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 8px;
+    color: #cbd5e0;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    margin-bottom: 12px;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: rgba(0, 212, 255, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+}
+
+.input-field::placeholder {
+    color: #718096;
+}
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.badge-error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+/* ============================================================
+   MODAIS
+   ============================================================ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00d4ff;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+    padding-bottom: 16px;
+}
+
+.modal-header h3 {
+    color: #00d4ff;
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-body {
+    margin-bottom: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* ============================================================
+   NOTIFICAÇÕES (TOAST)
+   ============================================================ */
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+}
+
+.toast-success {
+    background: #10b981;
+}
+
+.toast-error {
+    background: #ef4444;
+}
+
+.toast-warning {
+    background: #f59e0b;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-card {
+        max-width: 90%;
+        padding: 20px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+}
