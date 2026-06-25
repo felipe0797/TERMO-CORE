@@ -1,0 +1,125 @@
+/**
+ * PLATFORM ADDITIONAL STYLES
+ * Estilos adicionais específicos da plataforma
+ */
+
+/* ============================================================
+   ANIMAÇÕES GLOBAIS
+   ============================================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ============================================================
+   LOADING STATE
+   ============================================================ */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.text-muted {
+    color: #888;
+}
+
+.text-success {
+    color: #22c55e;
+}
+
+.text-error {
+    color: #ef4444;
+}
+
+.text-warning {
+    color: #f97316;
+}
+
+.text-info {
+    color: #3b82f6;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================================
+   HIGH CONTRAST
+   ============================================================ */
+@media (prefers-contrast: more) {
+    .btn-primary,
+    .btn-secondary,
+    .btn-ghost {
+        border-width: 2px;
+    }
+
+    .card,
+    .login-card {
+        border-width: 2px;
+    }
+}
