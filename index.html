@@ -10,115 +10,161 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Styles - Shared -->
-    <link rel="stylesheet" href="shared/styles-shared.css">
+    <!-- Styles - TermoCore (Login + Base) -->
+    <link rel="stylesheet" href="games/termocore/styles.css">
     
-    <!-- Styles - Auth -->
-    <link rel="stylesheet" href="platform/auth/unified-auth-styles.css">
-    
-    <!-- Styles - Profile -->
+    <!-- Styles - Platform Components -->
     <link rel="stylesheet" href="platform/profile/global-profile-styles.css">
-    
-    <!-- Styles - Social -->
     <link rel="stylesheet" href="platform/social/global-social-styles.css">
-    
-    <!-- Styles - Achievements -->
     <link rel="stylesheet" href="platform/achievements/global-achievements-styles.css">
-    
-    <!-- Styles - Shop -->
     <link rel="stylesheet" href="platform/shop/universal-shop-styles.css">
-    
-    <!-- Styles - Roulette -->
     <link rel="stylesheet" href="platform/roulette/platform-roulette-styles.css">
-    
-    <!-- Styles - Games Selector -->
     <link rel="stylesheet" href="platform/games-selector/game-selector-styles.css">
-    
-    <!-- Styles - Platform -->
-    <link rel="stylesheet" href="platform/platform-styles.css">
 </head>
 <body>
-    <!-- ===== TELA DE LOGIN ===== -->
-    <div id="screen-login" class="screen active">
-        <div id="auth-container"></div>
+
+<!-- ===== TELA DE LOGIN (Do TermoCore) ===== -->
+<div id="screen-login" class="screen active">
+    <div class="login-bg-glow"></div>
+    <div id="login-version-badge" style="position: absolute; bottom: 10px; right: 10px; background: rgba(100, 100, 255, 0.8); color: white; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-family: monospace; border: 1px solid rgba(150, 150, 255, 0.5); z-index: 101;">v2.1.0 - Platform</div>
+    <div class="login-card">
+        <div class="login-logo">
+            <span class="logo-termo">CORE</span><span class="logo-pro">GAMES</span>
+        </div>
+        <p class="login-subtitle">Biblioteca de Jogos</p>
+
+        <div id="login-form" class="auth-form">
+            <div class="input-group">
+                <label>EMAIL OU NOME DE USUÁRIO</label>
+                <input type="text" id="auth-user" placeholder="seu@email.com ou nome_usuario" maxlength="255" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label>SENHA</label>
+                <div class="password-input-wrapper">
+                    <input type="password" id="auth-pin" placeholder="mínimo 6 caracteres" maxlength="255" autocomplete="current-password" class="password-input">
+                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-auth-pin" onclick="togglePasswordVisibility('auth-pin')" title="Mostrar/Ocultar senha">
+                        <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <line class="eye-icon-slash" x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button onclick="handleAuth()" class="btn-primary btn-full">ENTRAR</button>
+            <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Criar conta</button>
+            <div class="auth-divider"><span>OU</span></div>
+            <button onclick="handleGuestLogin()" class="btn-guest btn-full">JOGAR COMO VISITANTE</button>
+        </div>
+
+        <div id="register-form" class="auth-form hidden">
+            <div class="input-group">
+                <label>EMAIL</label>
+                <input type="email" id="reg-user" placeholder="seu@email.com" maxlength="255" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label>NOME DE USUÁRIO</label>
+                <input type="text" id="reg-username" placeholder="seu nome de usuário" maxlength="20" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>SENHA</label>
+                <div class="password-input-wrapper">
+                    <input type="password" id="reg-pin" placeholder="mínimo 6 caracteres" maxlength="255" autocomplete="new-password" class="password-input">
+                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-reg-pin" onclick="togglePasswordVisibility('reg-pin')" title="Mostrar/Ocultar senha">
+                        <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <line class="eye-icon-slash" x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>CONFIRMAR SENHA</label>
+                <div class="password-input-wrapper">
+                    <input type="password" id="reg-pin-confirm" placeholder="repita a senha" maxlength="255" autocomplete="new-password" class="password-input">
+                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-reg-pin-confirm" onclick="togglePasswordVisibility('reg-pin-confirm')" title="Mostrar/Ocultar senha">
+                        <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <line class="eye-icon-slash" x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button onclick="handleRegister()" class="btn-primary btn-full">CADASTRAR</button>
+            <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Voltar ao login</button>
+        </div>
     </div>
+</div>
 
-    <!-- ===== TELA AUTENTICADA ===== -->
-    <div id="screen-authenticated" class="screen">
-        <!-- Header com Navegação -->
-        <div id="platform-header"></div>
+<!-- ===== TELA PRINCIPAL (PLATAFORMA) ===== -->
+<div id="screen-main" class="screen">
+    <!-- Header com Navegação -->
+    <div id="platform-header"></div>
 
-        <!-- Main Content com Abas -->
-        <main id="main-content">
-            <!-- Aba: Jogos -->
-            <div data-tab="games" class="tab-content active">
-                <div id="games-selector-container"></div>
-            </div>
+    <!-- Main Content com Abas -->
+    <main id="main-content">
+        <!-- Aba: Jogos -->
+        <div data-tab="games" class="tab-content active">
+            <div id="games-selector-container"></div>
+        </div>
 
-            <!-- Aba: Perfil -->
-            <div data-tab="profile" class="tab-content">
-                <div id="profile-container"></div>
-            </div>
+        <!-- Aba: Perfil -->
+        <div data-tab="profile" class="tab-content">
+            <div id="profile-container"></div>
+        </div>
 
-            <!-- Aba: Social -->
-            <div data-tab="social" class="tab-content">
-                <div id="social-container"></div>
-            </div>
+        <!-- Aba: Social -->
+        <div data-tab="social" class="tab-content">
+            <div id="social-container"></div>
+        </div>
 
-            <!-- Aba: Conquistas -->
-            <div data-tab="achievements" class="tab-content">
-                <div id="achievements-container"></div>
-            </div>
+        <!-- Aba: Conquistas -->
+        <div data-tab="achievements" class="tab-content">
+            <div id="achievements-container"></div>
+        </div>
 
-            <!-- Aba: Loja -->
-            <div data-tab="shop" class="tab-content">
-                <div id="shop-container"></div>
-            </div>
+        <!-- Aba: Loja -->
+        <div data-tab="shop" class="tab-content">
+            <div id="shop-container"></div>
+        </div>
 
-            <!-- Aba: Roleta -->
-            <div data-tab="roulette" class="tab-content">
-                <div id="roulette-container"></div>
-            </div>
-        </main>
-    </div>
+        <!-- Aba: Roleta -->
+        <div data-tab="roulette" class="tab-content">
+            <div id="roulette-container"></div>
+        </div>
+    </main>
+</div>
 
-    <!-- ===== SCRIPTS ===== -->
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="supabase-client.js"></script>
-    
-    <!-- Shared -->
-    <script src="shared/constants.js"></script>
-    <script src="shared/utils.js"></script>
-    
-    <!-- Auth -->
-    <script src="platform/auth/unified-auth-manager.js"></script>
-    <script src="platform/auth/unified-auth-ui.js"></script>
-    
-    <!-- Profile -->
-    <script src="platform/profile/global-profile-manager.js"></script>
-    <script src="platform/profile/global-profile-ui.js"></script>
-    
-    <!-- Social -->
-    <script src="platform/social/global-social-manager.js"></script>
-    <script src="platform/social/global-social-ui.js"></script>
-    
-    <!-- Achievements -->
-    <script src="platform/achievements/global-achievements-manager.js"></script>
-    <script src="platform/achievements/global-achievements-ui.js"></script>
-    
-    <!-- Shop -->
-    <script src="platform/shop/universal-shop-manager.js"></script>
-    <script src="platform/shop/universal-shop-ui.js"></script>
-    
-    <!-- Roulette -->
-    <script src="platform/roulette/platform-roulette-manager.js"></script>
-    <script src="platform/roulette/platform-roulette-ui.js"></script>
-    
-    <!-- Games Selector -->
-    <script src="platform/games-selector/game-selector-ui.js"></script>
-    
-    <!-- Main Platform Script -->
-    <script src="script.js"></script>
+<!-- ===== SCRIPTS ===== -->
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="games/termocore/supabase-client.js"></script>
+
+<!-- Shared -->
+<script src="shared/constants.js"></script>
+<script src="shared/utils.js"></script>
+
+<!-- Platform Components -->
+<script src="platform/profile/global-profile-manager.js"></script>
+<script src="platform/profile/global-profile-ui.js"></script>
+
+<script src="platform/social/global-social-manager.js"></script>
+<script src="platform/social/global-social-ui.js"></script>
+
+<script src="platform/achievements/global-achievements-manager.js"></script>
+<script src="platform/achievements/global-achievements-ui.js"></script>
+
+<script src="platform/shop/universal-shop-manager.js"></script>
+<script src="platform/shop/universal-shop-ui.js"></script>
+
+<script src="platform/roulette/platform-roulette-manager.js"></script>
+<script src="platform/roulette/platform-roulette-ui.js"></script>
+
+<script src="platform/games-selector/game-selector-ui.js"></script>
+
+<!-- Main Platform Script -->
+<script src="script.js"></script>
 </body>
 </html>
