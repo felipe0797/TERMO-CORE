@@ -11,6 +11,19 @@ let currentUserSupabaseId = null;
 let userStats = {};
 
 // ============================================================
+// FUNÇÃO PARA ESCONDER SPINNER
+// ============================================================
+function hideLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.add('hidden');
+        setTimeout(() => {
+            spinner.style.display = 'none';
+        }, 300);
+    }
+}
+
+// ============================================================
 // INICIALIZAÇÃO
 // ============================================================
 window.addEventListener('load', async () => {
@@ -29,6 +42,9 @@ window.addEventListener('load', async () => {
                 currentUserSupabaseId = userData.id;
                 console.log('✅ Usuário autenticado:', userData.username);
                 
+                // Esconder spinner
+                hideLoadingSpinner();
+                
                 // Mostrar tela principal
                 showScreen('main');
                 
@@ -38,7 +54,9 @@ window.addEventListener('load', async () => {
                 console.error('❌ Erro ao parsear usuário:', e);
             }
         } else {
-            console.log('⏳ Aguardando autenticação...');
+            console.log('⋳ Aguardando autenticação...');
+            // Esconder spinner mesmo sem autenticação
+            hideLoadingSpinner();
         }
     } catch (error) {
         console.error('❌ Erro ao inicializar plataforma:', error);
@@ -260,7 +278,19 @@ async function initializePlatform() {
         await renderPlatformHeader();
 
         // Renderizar conteúdo padrão das abas
-        if (typeof initializeDefaultContent === 'function') {
+        await initializeDefaultContent();
+        
+        // Renderizar abas melhoradas com dados reais
+        await renderEnhancedProfile();
+        await renderEnhancedShop();
+        await renderEnhancedSocial();
+        await renderEnhancedAchievements();
+        
+        // Iniciar sincronização periódica
+        startDataSyncInterval();
+        startProfileUpdateInterval();
+        startShopUpdateInterval();
+        startAchievementsUpdateInterval();= 'function') {
             initializeDefaultContent();
             console.log('✅ Conteúdo padrão renderizado');
         }
@@ -418,28 +448,37 @@ function showToast(message, type = 'info') {
     try {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
-        toast.textContent = message;
+        // Ícone baseado no tipo
+        const icon = type === 'success' ? '✅' : 
+                     type === 'error' ? '❌' : 
+                     type === 'warning' ? '⚠️' : 'ℹ️';
+        
+        toast.innerHTML = `<span style="margin-right: 8px;">${icon}</span>${message}`;
         
         const bgColor = type === 'success' ? '#10b981' : 
                        type === 'error' ? '#ef4444' : 
                        type === 'warning' ? '#f59e0b' : '#3b82f6';
         
+        const borderColor = type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 
+                           type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 
+                           type === 'warning' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(59, 130, 246, 0.3)';
+        
         toast.style.cssText = `
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 12px 16px;
+            padding: 14px 20px;
             background: ${bgColor};
             color: white;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
             z-index: 9999;
-            max-width: 280px;
-            max-height: 50px;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            max-width: 320px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid ${borderColor};
+            display: flex;
+            align-items: center;
             animation: slideIn 0.3s ease;
         `;
 
@@ -448,7 +487,7 @@ function showToast(message, type = 'info') {
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        }, 3500);
     } catch (error) {
         console.error('❌ Erro ao mostrar toast:', error);
     }
@@ -484,6 +523,49 @@ style.textContent = `
     @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .loading-spinner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    .loading-spinner.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .spinner-circle {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(0, 212, 255, 0.2);
+        border-top: 4px solid #00d4ff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+
+    .loading-spinner p {
+        color: #00d4ff;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 2px;
     }
 
     .screen {
