@@ -1,6 +1,7 @@
 /**
  * CORE GAMES PLATFORM - Main Script v2.1.0
  * Gerencia autenticação e abas da plataforma
+ * Usa o sistema de login do TermoCore para validações completas
  */
 
 // ============================================================
@@ -71,11 +72,12 @@ const authCheckInterval = setInterval(async () => {
 }, 500);
 
 // ============================================================
-// FUNÇÕES DE AUTENTICAÇÃO
+// FUNÇÕES DE AUTENTICAÇÃO (Wrapper do TermoCore)
 // ============================================================
 
 /**
  * Login com Email/Usuário e Senha
+ * Usa o sistema de login do TermoCore
  */
 async function handleAuth() {
     const userInput = document.getElementById('auth-user').value.trim();
@@ -87,9 +89,11 @@ async function handleAuth() {
     }
 
     try {
+        // Chamar a função de login do TermoCore
         const result = await loginUser(userInput, password);
+        
         if (result.success) {
-            // Sincronizar com localStorage
+            // Sincronizar com localStorage da plataforma
             localStorage.setItem('cg_auth_token', result.token || 'authenticated');
             localStorage.setItem('cg_current_user', JSON.stringify({
                 id: result.userId,
@@ -115,6 +119,7 @@ async function handleAuth() {
 
 /**
  * Criar nova conta
+ * Usa o sistema de registro do TermoCore
  */
 async function handleRegister() {
     const email = document.getElementById('reg-user').value.trim();
@@ -138,7 +143,9 @@ async function handleRegister() {
     }
 
     try {
+        // Chamar a função de registro do TermoCore
         const result = await registerUser(email, password, username);
+        
         if (result.success) {
             showToast('✅ Conta criada com sucesso! Faça login.', 'success');
             
@@ -161,12 +168,15 @@ async function handleRegister() {
 
 /**
  * Jogar como Visitante
+ * Usa o sistema de visitante do TermoCore
  */
 async function handleGuestLogin() {
     try {
+        // Chamar a função de visitante do TermoCore
         const result = await registerGuestUser();
+        
         if (result.success) {
-            // Sincronizar com localStorage
+            // Sincronizar com localStorage da plataforma
             localStorage.setItem('cg_auth_token', result.token || 'guest');
             localStorage.setItem('cg_current_user', JSON.stringify({
                 id: result.userId,
@@ -622,4 +632,4 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-console.log('✅ Core Games Platform v2.1.0 carregado');
+console.log('✅ Core Games Platform v2.1.0 carregado - Usando login do TermoCore');
