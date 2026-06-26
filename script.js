@@ -92,14 +92,15 @@ async function handleAuth() {
         // Chamar a função de login do TermoCore
         const result = await loginUser(userInput, password);
         
-        if (result.success) {
+        if (result.success && result.user) {
             // Sincronizar com localStorage da plataforma
-            localStorage.setItem('cg_auth_token', result.token || 'authenticated');
+            const user = result.user;
+            localStorage.setItem('cg_auth_token', 'authenticated');
             localStorage.setItem('cg_current_user', JSON.stringify({
-                id: result.userId,
-                email: result.email,
-                username: result.username,
-                is_guest: false
+                id: user.id,
+                email: user.email,
+                username: user.user_metadata?.username || user.email.split('@')[0],
+                is_guest: user.user_metadata?.is_guest || false
             }));
 
             showToast('✅ Login realizado com sucesso!', 'success');
@@ -109,7 +110,7 @@ async function handleAuth() {
                 window.location.reload();
             }, 1000);
         } else {
-            showToast(result.message || 'Erro ao fazer login', 'error');
+            showToast(result.error || 'Erro ao fazer login', 'error');
         }
     } catch (error) {
         console.error('❌ Erro ao fazer login:', error);
@@ -146,7 +147,7 @@ async function handleRegister() {
         // Chamar a função de registro do TermoCore
         const result = await registerUser(email, password, username);
         
-        if (result.success) {
+        if (result.success && result.user) {
             showToast('✅ Conta criada com sucesso! Faça login.', 'success');
             
             // Voltar para tela de login
@@ -158,7 +159,7 @@ async function handleRegister() {
             document.getElementById('reg-pin').value = '';
             document.getElementById('reg-pin-confirm').value = '';
         } else {
-            showToast(result.message || 'Erro ao criar conta', 'error');
+            showToast(result.error || 'Erro ao criar conta', 'error');
         }
     } catch (error) {
         console.error('❌ Erro ao criar conta:', error);
@@ -175,13 +176,14 @@ async function handleGuestLogin() {
         // Chamar a função de visitante do TermoCore
         const result = await registerGuestUser();
         
-        if (result.success) {
+        if (result.success && result.user) {
             // Sincronizar com localStorage da plataforma
-            localStorage.setItem('cg_auth_token', result.token || 'guest');
+            const user = result.user;
+            localStorage.setItem('cg_auth_token', 'guest');
             localStorage.setItem('cg_current_user', JSON.stringify({
-                id: result.userId,
-                email: result.email,
-                username: result.username,
+                id: user.id,
+                email: user.email,
+                username: user.user_metadata?.username || 'Visitante',
                 is_guest: true
             }));
 
@@ -192,7 +194,7 @@ async function handleGuestLogin() {
                 window.location.reload();
             }, 1000);
         } else {
-            showToast(result.message || 'Erro ao fazer login como visitante', 'error');
+            showToast(result.error || 'Erro ao fazer login como visitante', 'error');
         }
     } catch (error) {
         console.error('❌ Erro ao fazer login como visitante:', error);
@@ -489,6 +491,10 @@ style.textContent = `
     }
 
     .screen.active {
+        display: flex;
+    }
+
+    #screen-main.active {
         display: block;
     }
 

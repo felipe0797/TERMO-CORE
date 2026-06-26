@@ -208,7 +208,7 @@ function initializeDefaultContent() {
         
         // Renderizar Game Selector usando o componente
         if (typeof gameSelectorUI !== 'undefined') {
-            gameSelectorUI.render();
+            gameSelectorUI.renderGameSelector();
         }
         
         console.log('✅ Conteúdo padrão renderizado com sucesso');
