@@ -32,31 +32,18 @@ async function loadUserDataFromTermoCore(userId) {
 // CALCULAR NÍVEL A PARTIR DO XP
 // ============================================================
 function calculateLevelFromXP(xp) {
-    // Fórmula: Cada nível requer 100 * nível de XP
-    // Nível 1: 0-99 XP
-    // Nível 2: 100-299 XP
-    // Nível 3: 300-599 XP
-    let level = 1;
-    let totalXpRequired = 0;
-    
-    while (true) {
-        const xpForNextLevel = 100 * level;
-        if (totalXpRequired + xpForNextLevel > xp) {
-            break;
-        }
-        totalXpRequired += xpForNextLevel;
-        level++;
-    }
-    
-    const xpInCurrentLevel = xp - totalXpRequired;
-    const xpNeededForNextLevel = 100 * level;
+    // Sincronizado com TermoCore (script.js:556)
+    const level = Math.floor(Math.pow(xp / 100, 1/1.5)) || 1;
+    const currentLevelXP = Math.round(100 * Math.pow(level, 1.5));
+    const nextLevelXP    = Math.round(100 * Math.pow(level + 1, 1.5));
+    const progressXP     = xp - currentLevelXP;
+    const neededXP       = nextLevelXP - currentLevelXP;
     
     return {
-        level,
-        currentXP: xpInCurrentLevel,
-        totalXP: xp,
-        xpForNextLevel: xpNeededForNextLevel,
-        progressPercent: Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100)
+        level: level,
+        currentXP: xp,
+        xpForNextLevel: nextLevelXP,
+        progressPercent: Math.min(100, (progressXP / neededXP) * 100)
     };
 }
 
@@ -65,34 +52,32 @@ function calculateLevelFromXP(xp) {
 // ============================================================
 async function getUserAvatar(userId) {
     try {
-        const client = getSupabaseClient();
-        if (!client) return '👤';
-        
-        // Buscar avatar ativo do usuário
-        const { data, error } = await client
-            .from('shop_items')
-            .select('item_id')
-            .eq('user_id', userId)
-            .eq('is_active', true)
-            .like('item_id', 'avatar_%')
-            .single();
-        
-        if (error || !data) {
-            console.log('ℹ️ Usando avatar padrão');
-            return '👤';
+        // Se estivermos no contexto da plataforma, tentar usar a lógica do TermoCore
+        if (typeof getAvatarDisplay === 'function') {
+            const platformUser = localStorage.getItem('cg_current_user');
+            let username = 'Usuário';
+            if (platformUser) {
+                const userData = JSON.parse(platformUser);
+                username = userData.username || userData.email.split('@')[0];
+            }
+            
+            // Garantir que os stats do usuário estejam carregados para o getAvatarDisplay
+            if (typeof loadUserStatsFromSupabase === 'function') {
+                const stats = await loadUserStatsFromSupabase(userId);
+                if (stats) {
+                    // Temporariamente injetar no escopo global se necessário, 
+                    // ou passar como override se a função permitir
+                    return getAvatarDisplay(username, {
+                        activeAvatarVariant: stats.activeAvatarVariant,
+                        activeCosmetics: stats.activeCosmetics
+                    });
+                }
+            }
+            return getAvatarDisplay(username);
         }
-        
-        // Mapear item_id para emoji
-        const avatarMap = {
-            'avatar_hero': '🦸',
-            'avatar_wizard': '🧙',
-            'avatar_pirate': '🏴‍☠️',
-            'avatar_astronaut': '🧑‍🚀',
-            'avatar_robot': '🤖',
-            'avatar_alien': '👽'
-        };
-        
-        return avatarMap[data.item_id] || '👤';
+
+        // Fallback simplificado se a função do TermoCore não estiver disponível
+        return '<div style="font-size: 50px;">👤</div>';
     } catch (error) {
         console.error('❌ Erro ao obter avatar:', error);
         return '👤';
@@ -215,14 +200,36 @@ async function getUserInventory(userId) {
             return [];
         }
         
-        // Mapear itens para formato amigável
-        return data.map(item => ({
-            id: item.item_id,
-            name: formatItemName(item.item_id),
-            type: getItemType(item.item_id),
-            isActive: item.is_active,
-            icon: getItemIcon(item.item_id)
-        }));
+        // Mapear itens para formato amigável com suporte a metadados de jogo
+        return data.map(item => {
+            const type = getItemType(item.item_id);
+            const gameId = getItemGameId(item.item_id);
+            
+            // Tentar obter dados ricos do SHOP_ITEMS se disponível
+            let richData = {};
+            if (typeof SHOP_ITEMS !== 'undefined') {
+                const shopItem = SHOP_ITEMS.find(i => i.id === item.item_id);
+                if (shopItem) {
+                    richData = {
+                        name: shopItem.name,
+                        icon: shopItem.icon,
+                        avatarUrl: shopItem.avatarUrl,
+                        category: shopItem.category
+                    };
+                }
+            }
+
+            return {
+                id: item.item_id,
+                name: richData.name || formatItemName(item.item_id),
+                type: type,
+                gameId: gameId,
+                isActive: item.is_active,
+                icon: richData.icon || getItemIcon(item.item_id),
+                avatarUrl: richData.avatarUrl,
+                category: richData.category || type
+            };
+        });
     } catch (error) {
         console.error('❌ Erro ao obter inventário:', error);
         return [];
@@ -244,9 +251,26 @@ function formatItemName(itemId) {
 function getItemType(itemId) {
     if (itemId.startsWith('theme_')) return 'theme';
     if (itemId.startsWith('avatar_')) return 'avatar';
-    if (itemId.startsWith('frame_')) return 'frame';
+    if (itemId.startsWith('frame_')) return 'cosmetic'; // Frames são cosméticos
     if (itemId.startsWith('cosmetic_')) return 'cosmetic';
+    if (itemId.startsWith('var_')) return 'avatar';
     return 'other';
+}
+
+function getItemGameId(itemId) {
+    // Por enquanto, quase tudo vem do TermoCore
+    // Temas da plataforma começam com theme_ mas são específicos
+    const platformThemes = ['theme_default', 'theme_neon', 'theme_sunset'];
+    if (platformThemes.includes(itemId)) return 'platform';
+    
+    // Itens do TermoCore (baseado no catálogo conhecido)
+    const termocorePrefixes = ['avatar_toon_', 'avatar_croo_', 'avatar_ears_', 'avatar_boots_', 'cosmetic_frame_'];
+    if (termocorePrefixes.some(p => itemId.startsWith(p))) return 'termocore';
+    
+    // Fallback: se for tema e não for da plataforma, provavelmente é de um jogo (mas o usuário disse que temas de jogos não aparecem)
+    if (itemId.startsWith('theme_')) return 'termocore';
+    
+    return 'termocore'; // Default para o jogo atual
 }
 
 function getItemIcon(itemId) {
@@ -280,9 +304,16 @@ function startDataSyncInterval() {
                     // Atualizar localStorage com dados reais
                     userData.xp = stats.xp;
                     userData.coins = stats.coins;
-                    userData.spinTickets = stats.spinTickets;
+                    userData.spinTickets = stats.spinTickets || stats.spin_tickets || 0;
                     
                     localStorage.setItem('cg_current_user', JSON.stringify(userData));
+                    
+                    // Se estivermos na aba perfil, forçar re-render para mostrar dados novos
+                    const activeTab = document.querySelector('.nav-btn.active')?.getAttribute('data-tab');
+                    if (activeTab === 'profile' && typeof renderEnhancedProfile === 'function') {
+                        renderEnhancedProfile();
+                    }
+                    
                     console.log('🔄 Dados sincronizados com sucesso');
                 }
             } catch (error) {

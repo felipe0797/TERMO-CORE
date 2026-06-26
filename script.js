@@ -320,13 +320,13 @@ async function initializePlatform() {
     try {
         console.log('📱 Inicializando plataforma...');
 
+        // Renderizar conteúdo padrão das abas (apenas uma vez como placeholder)
+        await initializeDefaultContent();
+
         // Renderizar header
         await renderPlatformHeader();
-
-        // Renderizar conteúdo padrão das abas
-        await initializeDefaultContent();
         
-        // Renderizar abas melhoradas com dados reais
+        // Renderizar abas melhoradas com dados reais imediatamente
         await renderEnhancedProfile();
         await renderEnhancedShop();
         await renderEnhancedSocial();
@@ -337,11 +337,6 @@ async function initializePlatform() {
         startProfileUpdateInterval();
         startShopUpdateInterval();
         startAchievementsUpdateInterval();
-        
-        if (typeof initializeDefaultContent === 'function') {
-            initializeDefaultContent();
-            console.log('✅ Conteúdo padrão renderizado');
-        }
 
         // Anexar event listeners
         attachTabListeners();
@@ -368,6 +363,15 @@ async function renderPlatformHeader() {
             try {
                 const userData = JSON.parse(platformUser);
                 username = userData.username || 'Usuário';
+                
+                // Carregar dados reais para o header
+                if (typeof loadUserDataFromTermoCore === 'function') {
+                    const stats = await loadUserDataFromTermoCore(userData.id);
+                    if (stats && stats.xp) {
+                        const levelInfo = calculateLevelFromXP(stats.xp);
+                        level = levelInfo.level;
+                    }
+                }
             } catch (e) {
                 console.error('❌ Erro ao parsear usuário:', e);
             }
