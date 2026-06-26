@@ -24,9 +24,6 @@
     <link rel="stylesheet" href="platform/roulette/platform-roulette-styles.css">
     <link rel="stylesheet" href="platform/games-selector/game-selector-styles.css">
     
-    <!-- Main Platform Script (deve estar antes dos scripts de sincronização) -->
-    <script src="script.js"></script>
-    
     <!-- Scripts de sincronização de dados -->
     <script src="platform/platform-data-sync.js"></script>
     <script src="platform/profile/platform-profile-enhanced.js"></script>
@@ -185,5 +182,8 @@
 
 <!-- Default Content -->
 <script src="platform/tabs-default-content.js"></script>
+
+<!-- Main Platform Script (no final do body para garantir que tudo está carregado) -->
+<script src="script.js"></script>
 </body>
 </html>
