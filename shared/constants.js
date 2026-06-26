@@ -6,8 +6,10 @@
 // ============================================================
 // SUPABASE CONFIGURATION
 // ============================================================
-const SUPABASE_URL = 'https://tdxygivlneimyorbxzzy.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_LjpRcjeUfTAw0TSxYJhlzQ_dX_jzYVa';
+// As constantes de Supabase já são declaradas no supabase-client.js
+// Se não estiverem lá, descomente as linhas abaixo:
+// const SUPABASE_URL = 'https://tdxygivlneimyorbxzzy.supabase.co';
+// const SUPABASE_ANON_KEY = 'sb_publishable_LjpRcjeUfTAw0TSxYJhlzQ_dX_jzYVa';
 
 // ============================================================
 // GAMES CATALOG

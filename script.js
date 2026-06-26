@@ -316,7 +316,9 @@ async function initializePlatform() {
         startDataSyncInterval();
         startProfileUpdateInterval();
         startShopUpdateInterval();
-        startAchievementsUpdateInterval();= 'function') {
+        startAchievementsUpdateInterval();
+        
+        if (typeof initializeDefaultContent === 'function') {
             initializeDefaultContent();
             console.log('✅ Conteúdo padrão renderizado');
         }
