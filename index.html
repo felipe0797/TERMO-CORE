@@ -58,7 +58,7 @@
                 <label>SENHA</label>
                 <div class="password-input-wrapper">
                     <input type="password" id="auth-pin" placeholder="mínimo 6 caracteres" maxlength="255" autocomplete="current-password" class="password-input">
-                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-auth-pin" onclick="togglePasswordVisibility('auth-pin')" title="Mostrar/Ocultar senha">
+                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-auth-pin" title="Mostrar/Ocultar senha">
                         <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -67,10 +67,10 @@
                     </button>
                 </div>
             </div>
-            <button onclick="handleAuth()" class="btn-primary btn-full">ENTRAR</button>
-            <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Criar conta</button>
+            <button id="btn-login" class="btn-primary btn-full">ENTRAR</button>
+            <button id="btn-toggle-mode" class="btn-ghost btn-full">Criar conta</button>
             <div class="auth-divider"><span>OU</span></div>
-            <button onclick="handleGuestLogin()" class="btn-guest btn-full">JOGAR COMO VISITANTE</button>
+            <button id="btn-guest-login" class="btn-guest btn-full">JOGAR COMO VISITANTE</button>
         </div>
 
         <div id="register-form" class="auth-form hidden">
@@ -86,7 +86,7 @@
                 <label>SENHA</label>
                 <div class="password-input-wrapper">
                     <input type="password" id="reg-pin" placeholder="mínimo 6 caracteres" maxlength="255" autocomplete="new-password" class="password-input">
-                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-reg-pin" onclick="togglePasswordVisibility('reg-pin')" title="Mostrar/Ocultar senha">
+                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-reg-pin" title="Mostrar/Ocultar senha">
                         <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -99,7 +99,7 @@
                 <label>CONFIRMAR SENHA</label>
                 <div class="password-input-wrapper">
                     <input type="password" id="reg-pin-confirm" placeholder="repita a senha" maxlength="255" autocomplete="new-password" class="password-input">
-                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-reg-pin-confirm" onclick="togglePasswordVisibility('reg-pin-confirm')" title="Mostrar/Ocultar senha">
+                    <button type="button" class="toggle-password-btn password-hidden" id="toggle-reg-pin-confirm" title="Mostrar/Ocultar senha">
                         <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -108,8 +108,8 @@
                     </button>
                 </div>
             </div>
-            <button onclick="handleRegister()" class="btn-primary btn-full">CADASTRAR</button>
-            <button onclick="toggleAuthMode()" class="btn-ghost btn-full">Voltar ao login</button>
+            <button id="btn-register" class="btn-primary btn-full">CADASTRAR</button>
+            <button id="btn-toggle-mode-2" class="btn-ghost btn-full">Voltar ao login</button>
         </div>
     </div>
 </div>

@@ -24,9 +24,35 @@ function hideLoadingSpinner() {
 }
 
 // ============================================================
+// ADICIONAR EVENT LISTENERS
+// ============================================================
+function attachEventListeners() {
+    console.log('🔗 Vinculando eventos aos botões...');
+    
+    // Botões de login
+    document.getElementById('btn-login')?.addEventListener('click', handleAuth);
+    document.getElementById('btn-toggle-mode')?.addEventListener('click', toggleAuthMode);
+    document.getElementById('btn-guest-login')?.addEventListener('click', handleGuestLogin);
+    
+    // Botões de registro
+    document.getElementById('btn-register')?.addEventListener('click', handleRegister);
+    document.getElementById('btn-toggle-mode-2')?.addEventListener('click', toggleAuthMode);
+    
+    // Botões de toggle de senha
+    document.getElementById('toggle-auth-pin')?.addEventListener('click', () => togglePasswordVisibility('auth-pin'));
+    document.getElementById('toggle-reg-pin')?.addEventListener('click', () => togglePasswordVisibility('reg-pin'));
+    document.getElementById('toggle-reg-pin-confirm')?.addEventListener('click', () => togglePasswordVisibility('reg-pin-confirm'));
+    
+    console.log('✅ Event listeners adicionados com sucesso');
+}
+
+// ============================================================
 // INICIALIZAÇÃO
 // ============================================================
 window.addEventListener('load', async () => {
+    // Vincular eventos imediatamente
+    attachEventListeners();
+
     console.log('🚀 Iniciando Core Games Platform v2.1.0');
 
     try {
