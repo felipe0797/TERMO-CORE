@@ -11,8 +11,16 @@ let currentUserSupabaseId = null;
 let userStats = {};
 
 // ============================================================
-// FUNÇÃO PARA ESCONDER SPINNER
+// SISTEMA DE SPINNER E FEEDBACK
 // ============================================================
+function showLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.style.display = 'flex';
+        spinner.classList.remove('hidden');
+    }
+}
+
 function hideLoadingSpinner() {
     const spinner = document.getElementById('loading-spinner');
     if (spinner) {
@@ -132,6 +140,10 @@ async function handleAuth() {
         return;
     }
 
+    // Feedback imediato
+    showToast('Iniciando sessão...', 'info');
+    showLoadingSpinner();
+
     try {
         // Chamar a função de login do TermoCore
         const result = await loginUser(userInput, password);
@@ -187,6 +199,10 @@ async function handleRegister() {
         return;
     }
 
+    // Feedback imediato
+    showToast('Criando sua conta...', 'info');
+    showLoadingSpinner();
+
     try {
         // Chamar a função de registro do TermoCore
         const result = await registerUser(email, password, username);
@@ -216,6 +232,10 @@ async function handleRegister() {
  * Usa o sistema de visitante do TermoCore
  */
 async function handleGuestLogin() {
+    // Feedback imediato
+    showToast('Iniciando sessão de visitante...', 'info');
+    showLoadingSpinner();
+
     try {
         // Chamar a função de visitante do TermoCore
         const result = await registerGuestUser();
@@ -474,48 +494,72 @@ async function handleLogout() {
 // ============================================================
 function showToast(message, type = 'info') {
     try {
+        // Remover toasts antigos para evitar empilhamento
+        const oldToasts = document.querySelectorAll('.toast-container');
+        oldToasts.forEach(t => t.remove());
+
         const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        // Ícone baseado no tipo
-        const icon = type === 'success' ? '✅' : 
-                     type === 'error' ? '❌' : 
-                     type === 'warning' ? '⚠️' : 'ℹ️';
+        toast.className = `toast-container toast-${type}`;
         
-        toast.innerHTML = `<span style="margin-right: 8px;">${icon}</span>${message}`;
-        
-        const bgColor = type === 'success' ? '#10b981' : 
-                       type === 'error' ? '#ef4444' : 
-                       type === 'warning' ? '#f59e0b' : '#3b82f6';
-        
-        const borderColor = type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 
-                           type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 
-                           type === 'warning' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(59, 130, 246, 0.3)';
+        const colors = {
+            success: { bg: 'rgba(16, 185, 129, 0.95)', icon: '✅' },
+            error: { bg: 'rgba(239, 68, 68, 0.95)', icon: '❌' },
+            warning: { bg: 'rgba(245, 158, 11, 0.95)', icon: '⚠️' },
+            info: { bg: 'rgba(59, 130, 246, 0.95)', icon: 'ℹ️' }
+        };
+        const config = colors[type] || colors.info;
+
+        toast.innerHTML = `
+            <div class="toast-progress"></div>
+            <div class="toast-content">
+                <span class="toast-icon">${config.icon}</span>
+                <span class="toast-message">${message}</span>
+            </div>
+        `;
         
         toast.style.cssText = `
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 14px 20px;
-            background: ${bgColor};
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: ${config.bg};
+            backdrop-filter: blur(10px);
             color: white;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 600;
             font-size: 14px;
-            z-index: 9999;
-            max-width: 320px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 2px solid ${borderColor};
+            z-index: 10000;
+            min-width: 280px;
+            max-width: 90vw;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            overflow: hidden;
             display: flex;
-            align-items: center;
-            animation: slideIn 0.3s ease;
+            flex-direction: column;
+            animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         `;
 
         document.body.appendChild(toast);
 
+        const progressBar = toast.querySelector('.toast-progress');
+        progressBar.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.5);
+            width: 100%;
+            animation: toastProgress 3s linear forwards;
+        `;
+
+        const content = toast.querySelector('.toast-content');
+        content.style.cssText = `display: flex; align-items: center; gap: 12px;`;
+
         setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease';
+            toast.style.animation = 'toastOut 0.3s ease forwards';
             setTimeout(() => toast.remove(), 300);
-        }, 3500);
+        }, 3000);
     } catch (error) {
         console.error('❌ Erro ao mostrar toast:', error);
     }
@@ -526,26 +570,19 @@ function showToast(message, type = 'info') {
 // ============================================================
 const style = document.createElement('style');
 style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+    @keyframes toastIn {
+        from { transform: translate(-50%, -100px); opacity: 0; }
+        to { transform: translate(-50%, 0); opacity: 1; }
     }
 
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
+    @keyframes toastOut {
+        from { transform: translate(-50%, 0); opacity: 1; }
+        to { transform: translate(-50%, -100px); opacity: 0; }
+    }
+
+    @keyframes toastProgress {
+        from { width: 100%; }
+        to { width: 0%; }
     }
 
     @keyframes fadeIn {
