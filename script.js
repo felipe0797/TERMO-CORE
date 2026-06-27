@@ -320,25 +320,37 @@ async function initializePlatform() {
     try {
         console.log('📱 Inicializando plataforma...');
 
-        // Renderizar conteúdo padrão das abas (apenas uma vez como placeholder)
-        await initializeDefaultContent();
-
-        // Renderizar header
+        // 1. Renderizar header primeiro (já tenta carregar dados reais)
         await renderPlatformHeader();
         
-        // Renderizar abas melhoradas com dados reais imediatamente
-        await renderEnhancedProfile();
-        await renderEnhancedShop();
-        await renderEnhancedSocial();
-        await renderEnhancedAchievements();
-        
-        // Iniciar sincronização periódica
-        startDataSyncInterval();
-        startProfileUpdateInterval();
-        startShopUpdateInterval();
-        startAchievementsUpdateInterval();
+        // 2. Renderizar abas enhanced em paralelo
+        await Promise.allSettled([
+            renderEnhancedProfile(),
+            renderEnhancedShop(),
+            renderEnhancedSocial(),
+            renderEnhancedAchievements(),
+            typeof platformRouletteUI !== 'undefined' ? platformRouletteUI.renderRoulette() : Promise.resolve()
+        ]);
 
-        // Anexar event listeners
+        // 3. Conteúdo padrão apenas para abas sem enhanced (conquistas fallback, roleta fallback, seletor)
+        initializeDefaultContent();
+
+        // 4. Aplicar tema da plataforma salvo
+        const rawUser = localStorage.getItem('cg_current_user');
+        if (rawUser) {
+            const uid = JSON.parse(rawUser).id;
+            if (typeof getUserActiveTheme === 'function' && typeof applyThemeToDOM === 'function') {
+                getUserActiveTheme(uid).then(theme => applyThemeToDOM(theme));
+            }
+        }
+
+        // 5. Iniciar sincronização periódica
+        if (typeof startDataSyncInterval === 'function')        startDataSyncInterval();
+        if (typeof startProfileUpdateInterval === 'function')   startProfileUpdateInterval();
+        if (typeof startShopUpdateInterval === 'function')      startShopUpdateInterval();
+        if (typeof startAchievementsUpdateInterval === 'function') startAchievementsUpdateInterval();
+
+        // 6. Anexar event listeners
         attachTabListeners();
 
         console.log('✅ Plataforma inicializada');
@@ -392,13 +404,34 @@ async function renderPlatformHeader() {
                 </div>
                 <div class="header-right">
                     <div class="user-info">
-                        <span class="user-level">Nível ${level}</span>
-                        <span class="user-name">${username}</span>
+                        <div class="user-stats-header" style="display: flex; gap: 15px; margin-right: 15px; align-items: center;">
+                            <div class="header-stat" title="Moedas">
+                                <span style="color: #fbbf24;">💰</span>
+                                <span id="header-coins" style="color: #fff; font-weight: bold;">0</span>
+                            </div>
+                            <div class="header-stat" title="Fichas de Roleta">
+                                <span style="color: #00d4ff;">🎫</span>
+                                <span id="header-tickets" style="color: #fff; font-weight: bold;">0</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <span class="user-level" style="color: #00d4ff; font-weight: bold; font-size: 0.8em;">Nível ${level}</span>
+                            <span class="user-name" style="color: #fff; font-weight: 500;">${username}</span>
+                        </div>
                     </div>
                     <button onclick="handleLogout()" class="btn-logout">Sair</button>
                 </div>
             </div>
         `;
+
+        // Atualizar valores de moedas e tickets imediatamente se disponíveis
+        if (platformUser) {
+            const userData = JSON.parse(platformUser);
+            const coinsEl = document.getElementById('header-coins');
+            const ticketsEl = document.getElementById('header-tickets');
+            if (coinsEl) coinsEl.textContent = (userData.coins || 0).toLocaleString('pt-BR');
+            if (ticketsEl) ticketsEl.textContent = (userData.spinTickets || 0).toLocaleString('pt-BR');
+        }
 
         console.log('✅ Header renderizado');
     } catch (error) {
@@ -430,6 +463,16 @@ function switchTab(tabName) {
         if (activeBtn) {
             activeBtn.classList.add('active');
         }
+
+        // Re-renderizar aba ao clicar para dados frescos
+        const tabRenderers = {
+            profile:      () => typeof renderEnhancedProfile      === 'function' && renderEnhancedProfile(),
+            social:       () => typeof renderEnhancedSocial       === 'function' && renderEnhancedSocial(),
+            shop:         () => typeof renderEnhancedShop         === 'function' && renderEnhancedShop(),
+            achievements: () => typeof renderEnhancedAchievements === 'function' && renderEnhancedAchievements(),
+            roulette:     () => typeof platformRouletteUI         !== 'undefined' && platformRouletteUI.renderRoulette()
+        };
+        if (tabRenderers[tabName]) tabRenderers[tabName]();
 
         console.log(`✅ Mudou para aba: ${tabName}`);
     } catch (error) {
@@ -490,6 +533,29 @@ async function handleLogout() {
             console.error('❌ Erro ao desconectar:', error);
             showToast('Erro ao desconectar', 'error');
         }
+    }
+}
+
+// ============================================================
+// LANÇAR JOGO (helper global usado por loja, roleta e outros módulos)
+// ============================================================
+function launchGame(gameId) {
+    try {
+        if (typeof gameSelectorUI !== 'undefined') {
+            gameSelectorUI.playGame(gameId);
+        } else {
+            // Fallback direto
+            const paths = { termocore: 'games/termocore/index.html' };
+            const path = paths[gameId];
+            if (path) {
+                localStorage.setItem('core_games_current_game', gameId);
+                window.location.href = path;
+            } else {
+                showToast('Jogo não encontrado', 'error');
+            }
+        }
+    } catch (err) {
+        console.error('❌ launchGame:', err);
     }
 }
 

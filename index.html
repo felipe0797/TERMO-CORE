@@ -24,12 +24,7 @@
     <link rel="stylesheet" href="platform/roulette/platform-roulette-styles.css">
     <link rel="stylesheet" href="platform/games-selector/game-selector-styles.css">
     
-    <!-- Scripts de sincronização de dados -->
-    <script src="platform/platform-data-sync.js"></script>
-    <script src="platform/profile/platform-profile-enhanced.js"></script>
-    <script src="platform/shop/platform-shop-enhanced.js"></script>
-    <script src="platform/social/platform-social-enhanced.js"></script>
-    <script src="platform/achievements/platform-achievements-enhanced.js"></script>
+    <!-- Nota: scripts da plataforma carregados no body, após Supabase -->
 </head>
 <body>
 
@@ -156,34 +151,39 @@
 <!-- ===== SCRIPTS ===== -->
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="games/termocore/supabase-client.js"></script>
+	<script src="games/termocore/supabase-client.js"></script>
+	<script src="games/termocore/supabase-sync.js"></script>
 
 <!-- Shared -->
 <script src="shared/constants.js"></script>
 <script src="shared/utils.js"></script>
 
-<!-- Platform Components -->
-<script src="platform/profile/global-profile-manager.js"></script>
-<script src="platform/profile/global-profile-ui.js"></script>
+<!-- Platform Components (Legacy v2.0 - desativados na v2.2, mantidos para rollback) -->
+<!-- <script src="platform/profile/global-profile-manager.js"></script> -->
+<!-- <script src="platform/profile/global-profile-ui.js"></script> -->
+<!-- <script src="platform/social/global-social-manager.js"></script> -->
+<!-- <script src="platform/social/global-social-ui.js"></script> -->
+<!-- <script src="platform/achievements/global-achievements-manager.js"></script> -->
+<!-- <script src="platform/achievements/global-achievements-ui.js"></script> -->
+<!-- <script src="platform/shop/universal-shop-manager.js"></script> -->
+<!-- <script src="platform/shop/universal-shop-ui.js"></script> -->
 
-<script src="platform/social/global-social-manager.js"></script>
-<script src="platform/social/global-social-ui.js"></script>
-
-<script src="platform/achievements/global-achievements-manager.js"></script>
-<script src="platform/achievements/global-achievements-ui.js"></script>
-
-<script src="platform/shop/universal-shop-manager.js"></script>
-<script src="platform/shop/universal-shop-ui.js"></script>
-
+<!-- Roleta e Seletor de Jogos -->
 <script src="platform/roulette/platform-roulette-manager.js"></script>
 <script src="platform/roulette/platform-roulette-ui.js"></script>
-
 <script src="platform/games-selector/game-selector-ui.js"></script>
 
-<!-- Default Content -->
-<script src="platform/tabs-default-content.js"></script>
+<!-- V2.2 Enhanced Modules (ordem importa: data-sync primeiro) -->
+<script src="platform/platform-data-sync.js"></script>
+<script src="platform/profile/platform-profile-enhanced.js"></script>
+<script src="platform/shop/platform-shop-enhanced.js"></script>
+<script src="platform/social/platform-social-enhanced.js"></script>
+<script src="platform/achievements/platform-achievements-enhanced.js"></script>
 
-<!-- Main Platform Script (no final do body para garantir que tudo está carregado) -->
-<script src="script.js"></script>
+<!-- Default Content (fallback para conquistas e roleta) -->
+<script src="platform/tabs-default-content.js"></script>
+	
+	<!-- Main Platform Script (no final do body para garantir que tudo está carregado) -->
+	<script src="script.js"></script>
 </body>
 </html>

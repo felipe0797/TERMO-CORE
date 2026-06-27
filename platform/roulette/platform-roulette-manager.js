@@ -1,236 +1,130 @@
 /**
- * PLATFORM ROULETTE MANAGER - Core Games Platform
- * Gerencia roleta da plataforma Core Games
+ * PLATFORM ROULETTE MANAGER v2.2
+ * Gerencia a roleta de prêmios da plataforma Core Games.
+ * Usa game_stats (spin_tickets, coins, xp) — sem dependência de global_* ou universal_*.
  */
 
 class PlatformRouletteManager {
     constructor() {
-        this.supabase = null;
-        this.currentUserId = null;
-        this.rouletteConfig = null;
         this.isSpinning = false;
+        this.prizes = [
+            { id: 'coins_50',   label: '50 Moedas',    icon: '💰', type: 'coins',   value: 50,  weight: 30 },
+            { id: 'coins_100',  label: '100 Moedas',   icon: '💰', type: 'coins',   value: 100, weight: 20 },
+            { id: 'coins_250',  label: '250 Moedas',   icon: '💰', type: 'coins',   value: 250, weight: 10 },
+            { id: 'xp_100',     label: '100 XP',       icon: '⭐', type: 'xp',     value: 100, weight: 25 },
+            { id: 'xp_250',     label: '250 XP',       icon: '⭐', type: 'xp',     value: 250, weight: 10 },
+            { id: 'ticket_1',   label: '+1 Ficha',     icon: '🎟️', type: 'ticket', value: 1,   weight: 4 },
+            { id: 'coins_500',  label: '500 Moedas',   icon: '💎', type: 'coins',   value: 500, weight: 1 }
+        ];
     }
 
-    // ============================================================
-    // INICIALIZAÇÃO
-    // ============================================================
-    async init(supabaseClient) {
-        this.supabase = supabaseClient;
-        console.log('✅ PlatformRouletteManager inicializado');
-    }
-
-    async setCurrentUser(userId) {
-        this.currentUserId = userId;
-        await this.loadRouletteConfig();
-    }
-
-    // ============================================================
-    // CARREGAR CONFIGURAÇÃO DA ROLETA
-    // ============================================================
-    async loadRouletteConfig() {
-        if (!this.supabase) return;
-
-        try {
-            const { data, error } = await this.supabase
-                .from('platform_roulette_config')
-                .select('*')
-                .eq('id', 'coregames_roulette')
-                .single();
-
-            if (error && error.code !== 'PGRST116') {
-                throw error;
-            }
-
-            if (!data) {
-                // Criar configuração padrão
-                this.rouletteConfig = await this.createDefaultConfig();
-            } else {
-                this.rouletteConfig = data;
-            }
-
-            console.log('✅ Configuração da roleta carregada');
-        } catch (error) {
-            console.error('❌ Erro ao carregar roleta:', error);
+    // Sortear prêmio com base nos pesos
+    rollPrize() {
+        const total = this.prizes.reduce((sum, p) => sum + p.weight, 0);
+        let rand = Math.random() * total;
+        for (const prize of this.prizes) {
+            rand -= prize.weight;
+            if (rand <= 0) return prize;
         }
+        return this.prizes[0];
     }
 
-    // ============================================================
-    // CRIAR CONFIGURAÇÃO PADRÃO
-    // ============================================================
-    async createDefaultConfig() {
-        if (!this.supabase) return null;
-
-        const defaultConfig = {
-            id: 'coregames_roulette',
-            name: 'Roleta Core Games',
-            scope: 'global',
-            tickets_required: 1,
-            rewards: [
-                { type: 'coins', amount: 50, chance: 0.25 },
-                { type: 'coins', amount: 100, chance: 0.20 },
-                { type: 'coins', amount: 200, chance: 0.15 },
-                { type: 'xp', amount: 50, chance: 0.20 },
-                { type: 'xp', amount: 100, chance: 0.10 },
-                { type: 'tickets', amount: 1, chance: 0.05 },
-                { type: 'item', itemId: 'theme_neon', chance: 0.03 },
-                { type: 'item', itemId: 'frame_gold', chance: 0.02 }
-            ]
-        };
-
-        try {
-            const { data, error } = await this.supabase
-                .from('platform_roulette_config')
-                .insert([defaultConfig])
-                .select()
-                .single();
-
-            if (error) throw error;
-
-            return data;
-        } catch (error) {
-            console.error('❌ Erro ao criar configuração padrão:', error);
-            return null;
-        }
-    }
-
-    // ============================================================
-    // GIRAR ROLETA
-    // ============================================================
+    // Girar a roleta
     async spinRoulette() {
-        if (!this.currentUserId || !this.supabase || !this.rouletteConfig) {
-            showToast('Erro ao girar roleta', 'error');
-            return null;
-        }
+        if (this.isSpinning) { showToast('Aguarde o fim da rotação', 'warning'); return null; }
 
-        if (this.isSpinning) {
-            showToast('Aguarde o fim da rotação', 'warning');
-            return null;
-        }
+        const raw = localStorage.getItem('cg_current_user');
+        if (!raw) { showToast('Usuário não autenticado', 'error'); return null; }
+        const userData = JSON.parse(raw);
+        const userId = userData.id;
+
+        const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+        if (!client) { showToast('Erro de conexão', 'error'); return null; }
 
         try {
+            this.isSpinning = true;
+
             // Verificar fichas
-            const tickets = globalProfileManager.getGlobalTickets();
-            if (tickets < this.rouletteConfig.tickets_required) {
-                showToast('🎫 Fichas insuficientes!', 'error');
+            const { data: stats, error: statsErr } = await client
+                .from('game_stats')
+                .select('spin_tickets, coins, xp')
+                .eq('user_id', userId)
+                .single();
+
+            if (statsErr || !stats) {
+                showToast('Erro ao carregar dados', 'error');
+                this.isSpinning = false;
                 return null;
             }
 
-            // Descontar fichas
-            const success = await globalProfileManager.removeGlobalTickets(
-                this.rouletteConfig.tickets_required
-            );
-            if (!success) return null;
-
-            // Marcar como girando
-            this.isSpinning = true;
+            if ((stats.spin_tickets || 0) < 1) {
+                showToast('🎟️ Fichas insuficientes! Jogue TermoCore para ganhar fichas.', 'error');
+                this.isSpinning = false;
+                return null;
+            }
 
             // Sortear prêmio
-            const reward = this.selectReward();
+            const prize = this.rollPrize();
 
-            // Registrar giro
-            await this.recordSpin(reward);
+            // Calcular novos valores
+            const updates = { spin_tickets: (stats.spin_tickets || 0) - 1 };
+            if (prize.type === 'coins')  updates.coins = (stats.coins || 0) + prize.value;
+            if (prize.type === 'xp')     updates.xp    = (stats.xp    || 0) + prize.value;
+            if (prize.type === 'ticket') updates.spin_tickets = (stats.spin_tickets || 0) - 1 + prize.value;
 
-            // Processar prêmio
-            await this.processReward(reward);
+            // Salvar no banco
+            const { error: updateErr } = await client
+                .from('game_stats')
+                .update(updates)
+                .eq('user_id', userId);
+
+            if (updateErr) {
+                showToast('Erro ao salvar prêmio', 'error');
+                this.isSpinning = false;
+                return null;
+            }
+
+            // Atualizar localStorage
+            if (prize.type === 'coins')  userData.coins       = updates.coins;
+            if (prize.type === 'ticket') userData.spinTickets = updates.spin_tickets;
+            userData.spinTickets = updates.spin_tickets;
+            localStorage.setItem('cg_current_user', JSON.stringify(userData));
+
+            // Atualizar header
+            const coinsEl   = document.getElementById('header-coins');
+            const ticketsEl = document.getElementById('header-tickets');
+            if (coinsEl && updates.coins !== undefined)
+                coinsEl.textContent = updates.coins.toLocaleString('pt-BR');
+            if (ticketsEl)
+                ticketsEl.textContent = updates.spin_tickets.toLocaleString('pt-BR');
 
             this.isSpinning = false;
-
-            return reward;
-        } catch (error) {
-            console.error('❌ Erro ao girar roleta:', error);
+            return prize;
+        } catch (err) {
+            console.error('❌ [Roulette] spinRoulette:', err);
             this.isSpinning = false;
-            showToast('Erro ao girar roleta', 'error');
+            showToast('Erro inesperado', 'error');
             return null;
         }
     }
 
-    // ============================================================
-    // SELECIONAR PRÊMIO
-    // ============================================================
-    selectReward() {
-        const random = Math.random();
-        let accumulated = 0;
-
-        for (const reward of this.rouletteConfig.rewards) {
-            accumulated += reward.chance;
-            if (random <= accumulated) {
-                return reward;
-            }
-        }
-
-        // Fallback (não deveria acontecer)
-        return this.rouletteConfig.rewards[0];
-    }
-
-    // ============================================================
-    // PROCESSAR PRÊMIO
-    // ============================================================
-    async processReward(reward) {
+    async getTickets(userId) {
+        const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+        if (!client) return 0;
         try {
-            let message = '';
-
-            if (reward.type === 'coins') {
-                await globalProfileManager.addGlobalCoins(reward.amount);
-                message = `🎉 Você ganhou ${reward.amount} moedas!`;
-            } else if (reward.type === 'xp') {
-                await globalProfileManager.addGlobalXP(reward.amount);
-                message = `🎉 Você ganhou ${reward.amount} XP!`;
-            } else if (reward.type === 'tickets') {
-                await globalProfileManager.addGlobalTickets(reward.amount);
-                message = `🎉 Você ganhou ${reward.amount} fichas!`;
-            } else if (reward.type === 'item') {
-                const item = universalShopManager.getItemInfo(reward.itemId);
-                if (item) {
-                    await globalProfileManager.addToInventory(
-                        reward.itemId,
-                        item.game_id || 'global',
-                        item.item_type
-                    );
-                    message = `🎉 Você ganhou: ${item.name}!`;
-                }
-            }
-
-            showToast(message, 'success');
-        } catch (error) {
-            console.error('❌ Erro ao processar prêmio:', error);
-        }
+            const { data } = await client
+                .from('game_stats')
+                .select('spin_tickets')
+                .eq('user_id', userId)
+                .single();
+            return data?.spin_tickets || 0;
+        } catch { return 0; }
     }
 
-    // ============================================================
-    // REGISTRAR GIRO
-    // ============================================================
-    async recordSpin(reward) {
-        if (!this.supabase) return;
-
-        try {
-            await this.supabase
-                .from('platform_roulette_spins')
-                .insert([{
-                    user_id: this.currentUserId,
-                    reward_type: reward.type,
-                    reward_amount: reward.amount || reward.itemId,
-                    spun_at: new Date().toISOString()
-                }]);
-        } catch (error) {
-            console.error('❌ Erro ao registrar giro:', error);
-        }
-    }
-
-    // ============================================================
-    // GETTERS
-    // ============================================================
-    getRouletteConfig() {
-        return this.rouletteConfig;
-    }
-
-    getTicketsRequired() {
-        return this.rouletteConfig?.tickets_required || 1;
-    }
-
-    isSpinningNow() {
-        return this.isSpinning;
-    }
+    getTicketsRequired() { return 1; }
+    isSpinningNow()      { return this.isSpinning; }
 }
 
 // Instância global
 const platformRouletteManager = new PlatformRouletteManager();
+console.log('✅ platform-roulette-manager.js v2.2 carregado');

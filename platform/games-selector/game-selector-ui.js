@@ -156,10 +156,7 @@ class GameSelectorUI {
         }
 
         try {
-            // Registrar que está jogando este jogo
-            await globalProfileManager.addGamePlayed(gameId);
-
-            // Salvar no localStorage
+            // Salvar jogo atual no localStorage (sem depender de globalProfileManager)
             localStorage.setItem('core_games_current_game', gameId);
 
             // Redirecionar para o jogo

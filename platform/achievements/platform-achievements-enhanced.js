@@ -1,10 +1,152 @@
 /**
-/**
- * PLATFORM ACHIEVEMENTS ENHANCED
- * Conquistas melhoradas com seletor de jogo
+ * PLATFORM ACHIEVEMENTS ENHANCED v2.2
+ * Conquistas da plataforma Core Games.
+ * Lê dados reais de game_stats via loadUserDataFromTermoCore.
  */
 
 // ============================================================
-// RENDERIZAR CONQUISTAS MELHORADAS
+// RENDERIZAR CONQUISTAS
 // ============================================================
-async function renderEnhancedAchievements() {\n    const container = document.querySelector('[data-tab=\"achievements\"]');\n    if (!container) return;\n    \n    try {\n        const platformUser = localStorage.getItem('cg_current_user');\n        if (!platformUser) {\n            container.innerHTML = '<p>Usuário não autenticado</p>';\n            return;\n        }\n        \n        const userData = JSON.parse(platformUser);\n        const stats = await loadUserDataFromTermoCore(userData.id);\n        \n        // Conquistas disponíveis\n        const allAchievements = {\n            'termocore': [\n                {\n                    id: 'first_win',\n                    name: 'Primeira Vitória',\n                    description: 'Ganhe uma partida de 5 letras',\n                    icon: '🎯',\n                    unlocked: stats?.['5_LETTERS']?.wins > 0 || false,\n                    reward: '100 XP'\n                },\n                {\n                    id: 'perfect_game',\n                    name: 'Jogo Perfeito',\n                    description: 'Ganhe uma partida sem errar',\n                    icon: '⭐',\n                    unlocked: stats?.perfectGames5L > 0 || false,\n                    reward: '250 XP'\n                },\n                {\n                    id: 'survival_master',\n                    name: 'Mestre da Sobrevivência',\n                    description: 'Chegue na fase 10 no modo Sobrevivência',\n                    icon: '💪',\n                    unlocked: (stats?.bestSurvivalRound || 0) >= 10 || false,\n                    reward: '500 XP'\n                },\n                {\n                    id: 'avalanche_champion',\n                    name: 'Campeão da Avalanche',\n                    description: 'Chegue na fase 5 no modo Avalanche',\n                    icon: '🏔️',\n                    unlocked: (stats?.bestAvalanchePhase || 0) >= 5 || false,\n                    reward: '500 XP'\n                },\n                {\n                    id: 'collector',\n                    name: 'Colecionador',\n                    description: 'Ganhe 1000 moedas',\n                    icon: '💰',\n                    unlocked: (stats?.coins || 0) >= 1000 || false,\n                    reward: '200 XP'\n                },\n                {\n                    id: 'veteran',\n                    name: 'Veterano',\n                    description: 'Jogue 100 partidas',\n                    icon: '🎖️',\n                    unlocked: (stats?.totalGames || 0) >= 100 || false,\n                    reward: '300 XP'\n                }\n            ]\n        };\n        \n        const selectedGame = document.getElementById('achievement-game-select')?.value || 'termocore';\n        const achievements = allAchievements[selectedGame] || allAchievements['termocore'];\n        const unlockedCount = achievements.filter(a => a.unlocked).length;\n        \n        container.innerHTML = `\n            <div style=\"padding: 20px;\">\n                <!-- SELETOR DE JOGO -->\n                <div style=\"background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 100, 200, 0.1) 100%); padding: 16px; border-radius: 12px; border: 1px solid rgba(0, 212, 255, 0.2); margin-bottom: 20px;\">\n                    <label style=\"color: #a0aec0; font-size: 12px; display: block; margin-bottom: 8px;\">Filtrar por Jogo:</label>\n                    <select id=\"achievement-game-select\" onchange=\"renderEnhancedAchievements()\" style=\"width: 100%; padding: 10px; background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 6px; color: #cbd5e0; font-weight: 700;\">\n                        <option value=\"termocore\">🎮 TermoCore</option>\n                    </select>\n                </div>\n                \n                <!-- PROGRESSO -->\n                <div style=\"background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 100, 200, 0.1) 100%); padding: 16px; border-radius: 12px; border: 1px solid rgba(0, 212, 255, 0.2); margin-bottom: 20px;\">\n                    <div style=\"display: flex; justify-content: space-between; margin-bottom: 8px;\">\n                        <span style=\"color: #a0aec0; font-size: 12px;\">Progresso</span>\n                        <span style=\"color: #00d4ff; font-weight: 700; font-size: 12px;\">${unlockedCount}/${achievements.length} Desbloqueadas</span>\n                    </div>\n                    <div style=\"width: 100%; height: 8px; background: rgba(0, 212, 255, 0.1); border-radius: 4px; overflow: hidden;\">\n                        <div style=\"width: ${Math.round((unlockedCount / achievements.length) * 100)}%; height: 100%; background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%); transition: width 0.3s ease;\"></div>\n                    </div>\n                </div>\n                \n                <!-- CONQUISTAS -->\n                <div style=\"display: grid; gap: 12px;\">\n                    ${achievements.map(achievement => `\n                        <div style=\"background: ${achievement.unlocked ? 'rgba(16, 185, 129, 0.05)' : 'rgba(0, 212, 255, 0.05)'}; padding: 16px; border-radius: 8px; border: 1px solid ${achievement.unlocked ? 'rgba(16, 185, 129, 0.2)' : 'rgba(0, 212, 255, 0.1)'}; opacity: ${achievement.unlocked ? '1' : '0.7'};\">\n                            <div style=\"display: flex; gap: 12px;\">\n                                <div style=\"font-size: 32px;\">${achievement.icon}</div>\n                                <div style=\"flex: 1;\">\n                                    <div style=\"color: ${achievement.unlocked ? '#10b981' : '#cbd5e0'}; font-weight: 700; margin-bottom: 4px;\">${achievement.name}</div>\n                                    <div style=\"color: #a0aec0; font-size: 12px; margin-bottom: 8px;\">${achievement.description}</div>\n                                    <div style=\"display: flex; justify-content: space-between;\">\n                                        <span style=\"color: #a0aec0; font-size: 11px;\">Recompensa: ${achievement.reward}</span>\n                                        <span style=\"color: ${achievement.unlocked ? '#10b981' : '#a0aec0'}; font-size: 11px; font-weight: 700;\">${achievement.unlocked ? '✓ DESBLOQUEADA' : '🔒 BLOQUEADA'}</span>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    `).join('')}\n                </div>\n            </div>\n        `;\n        \n        console.log('✅ Conquistas renderizadas com sucesso');\n    } catch (error) {\n        console.error('❌ Erro ao renderizar conquistas:', error);\n        container.innerHTML = '<p>Erro ao carregar conquistas</p>';\n    }\n}\n\n// ============================================================\n// ATUALIZAR CONQUISTAS PERIODICAMENTE\n// ============================================================\nfunction startAchievementsUpdateInterval() {\n    setInterval(async () => {\n        const activeTab = document.querySelector('[data-tab].active');\n        if (activeTab && activeTab.getAttribute('data-tab') === 'achievements') {\n            await renderEnhancedAchievements();\n        }\n    }, 10000);\n}\n
+async function renderEnhancedAchievements() {
+    const container = document.querySelector('[data-tab="achievements"]');
+    if (!container) return;
+
+    try {
+        const raw = localStorage.getItem('cg_current_user');
+        if (!raw) {
+            container.innerHTML = '<p style="color:#a0aec0;padding:20px;">Usuário não autenticado</p>';
+            return;
+        }
+
+        const userData = JSON.parse(raw);
+        const stats    = await loadUserDataFromTermoCore(userData.id);
+
+        const allAchievements = {
+            termocore: [
+                {
+                    id: 'first_win',
+                    name: 'Primeira Vitória',
+                    description: 'Ganhe uma partida de 5 letras',
+                    icon: '🎯',
+                    unlocked: (stats?.['5_LETTERS']?.wins || 0) > 0,
+                    reward: '100 XP'
+                },
+                {
+                    id: 'perfect_game',
+                    name: 'Jogo Perfeito',
+                    description: 'Ganhe uma partida sem errar',
+                    icon: '⭐',
+                    unlocked: (stats?.perfectGames5L || 0) > 0,
+                    reward: '250 XP'
+                },
+                {
+                    id: 'survival_master',
+                    name: 'Mestre da Sobrevivência',
+                    description: 'Chegue na fase 10 no modo Sobrevivência',
+                    icon: '💪',
+                    unlocked: (stats?.bestSurvivalRound || 0) >= 10,
+                    reward: '500 XP'
+                },
+                {
+                    id: 'avalanche_champion',
+                    name: 'Campeão da Avalanche',
+                    description: 'Chegue na fase 5 no modo Avalanche',
+                    icon: '🏔️',
+                    unlocked: (stats?.bestAvalanchePhase || 0) >= 5,
+                    reward: '500 XP'
+                },
+                {
+                    id: 'collector',
+                    name: 'Colecionador',
+                    description: 'Acumule 1.000 moedas',
+                    icon: '💰',
+                    unlocked: (stats?.coins || 0) >= 1000,
+                    reward: '200 XP'
+                },
+                {
+                    id: 'veteran',
+                    name: 'Veterano',
+                    description: 'Jogue 100 partidas',
+                    icon: '🎖️',
+                    unlocked: (stats?.totalGames || 0) >= 100,
+                    reward: '300 XP'
+                }
+            ]
+        };
+
+        const selectedGame   = document.getElementById('achievement-game-select')?.value || 'termocore';
+        const achievements   = allAchievements[selectedGame] || allAchievements.termocore;
+        const unlockedCount  = achievements.filter(a => a.unlocked).length;
+        const progressPercent = achievements.length > 0
+            ? Math.round((unlockedCount / achievements.length) * 100)
+            : 0;
+
+        container.innerHTML = `
+        <div style="padding:20px;max-width:800px;margin:0 auto;">
+
+            <!-- SELETOR DE JOGO -->
+            <div style="background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(0,100,200,.1));padding:16px;border-radius:12px;border:1px solid rgba(0,212,255,.2);margin-bottom:20px;">
+                <label style="color:#a0aec0;font-size:12px;display:block;margin-bottom:8px;">Filtrar por Jogo:</label>
+                <select id="achievement-game-select" onchange="renderEnhancedAchievements()"
+                    style="width:100%;padding:10px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.2);border-radius:6px;color:#cbd5e0;font-weight:700;">
+                    <option value="termocore">🎮 TermoCore</option>
+                </select>
+            </div>
+
+            <!-- PROGRESSO -->
+            <div style="background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(0,100,200,.1));padding:16px;border-radius:12px;border:1px solid rgba(0,212,255,.2);margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#a0aec0;font-size:12px;">Progresso</span>
+                    <span style="color:#00d4ff;font-weight:700;font-size:12px;">${unlockedCount}/${achievements.length} Desbloqueadas</span>
+                </div>
+                <div style="width:100%;height:8px;background:rgba(0,212,255,.1);border-radius:4px;overflow:hidden;">
+                    <div style="width:${progressPercent}%;height:100%;background:linear-gradient(90deg,#00d4ff,#0099cc);transition:width .3s ease;"></div>
+                </div>
+            </div>
+
+            <!-- LISTA DE CONQUISTAS -->
+            <div style="display:grid;gap:12px;">
+                ${achievements.map(a => `
+                <div style="background:${a.unlocked ? 'rgba(16,185,129,.05)' : 'rgba(0,212,255,.05)'};
+                            padding:16px;border-radius:8px;
+                            border:1px solid ${a.unlocked ? 'rgba(16,185,129,.2)' : 'rgba(0,212,255,.1)'};
+                            opacity:${a.unlocked ? '1' : '0.7'};">
+                    <div style="display:flex;gap:12px;align-items:flex-start;">
+                        <div style="font-size:32px;">${a.icon}</div>
+                        <div style="flex:1;">
+                            <div style="color:${a.unlocked ? '#10b981' : '#cbd5e0'};font-weight:700;margin-bottom:4px;">${a.name}</div>
+                            <div style="color:#a0aec0;font-size:12px;margin-bottom:8px;">${a.description}</div>
+                            <div style="display:flex;justify-content:space-between;">
+                                <span style="color:#a0aec0;font-size:11px;">Recompensa: ${a.reward}</span>
+                                <span style="color:${a.unlocked ? '#10b981' : '#a0aec0'};font-size:11px;font-weight:700;">
+                                    ${a.unlocked ? '✓ DESBLOQUEADA' : '🔒 BLOQUEADA'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+        `;
+
+        console.log('✅ [Achievements] Conquistas renderizadas');
+    } catch (err) {
+        console.error('❌ [Achievements] renderEnhancedAchievements:', err);
+        container.innerHTML = '<p style="color:#ef4444;padding:20px;">Erro ao carregar conquistas.</p>';
+    }
+}
+
+// ============================================================
+// ATUALIZAÇÃO PERIÓDICA
+// ============================================================
+function startAchievementsUpdateInterval() {
+    setInterval(async () => {
+        const activeBtn = document.querySelector('.nav-btn.active');
+        if (activeBtn?.getAttribute('data-nav-btn') === 'achievements') {
+            await renderEnhancedAchievements();
+        }
+    }, 20000);
+}
+
+console.log('✅ platform-achievements-enhanced.js v2.2 carregado');
