@@ -404,34 +404,12 @@ async function renderPlatformHeader() {
                 </div>
                 <div class="header-right">
                     <div class="user-info">
-                        <div class="user-stats-header" style="display: flex; gap: 15px; margin-right: 15px; align-items: center;">
-                            <div class="header-stat" title="Moedas">
-                                <span style="color: #fbbf24;">💰</span>
-                                <span id="header-coins" style="color: #fff; font-weight: bold;">0</span>
-                            </div>
-                            <div class="header-stat" title="Fichas de Roleta">
-                                <span style="color: #00d4ff;">🎫</span>
-                                <span id="header-tickets" style="color: #fff; font-weight: bold;">0</span>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                            <span class="user-level" style="color: #00d4ff; font-weight: bold; font-size: 0.8em;">Nível ${level}</span>
-                            <span class="user-name" style="color: #fff; font-weight: 500;">${username}</span>
-                        </div>
+                        <span class="user-name" style="color: #fff; font-weight: 500;">${username}</span>
                     </div>
                     <button onclick="handleLogout()" class="btn-logout">Sair</button>
                 </div>
             </div>
         `;
-
-        // Atualizar valores de moedas e tickets imediatamente se disponíveis
-        if (platformUser) {
-            const userData = JSON.parse(platformUser);
-            const coinsEl = document.getElementById('header-coins');
-            const ticketsEl = document.getElementById('header-tickets');
-            if (coinsEl) coinsEl.textContent = (userData.coins || 0).toLocaleString('pt-BR');
-            if (ticketsEl) ticketsEl.textContent = (userData.spinTickets || 0).toLocaleString('pt-BR');
-        }
 
         console.log('✅ Header renderizado');
     } catch (error) {

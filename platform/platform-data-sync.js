@@ -116,26 +116,28 @@ function calculateLevelFromXP(xp) {
 
 // ============================================================
 // OBTER HTML DO AVATAR DO USUÁRIO
-// Independente de userStats global — usa dados passados diretamente.
+// Prioridade: avatarUrlFromDB → catálogo JS → padrão dicebear
 // ============================================================
-function buildAvatarHTML(activeAvatarVariantId, activeCosmetics) {
-    // Buscar no catálogo do TermoCore (SHOP_ITEMS definido em games/termocore/script.js)
+function buildAvatarHTML(activeAvatarVariantId, avatarUrlFromDB, activeCosmetics) {
+    // Tentar catálogo JS do TermoCore (disponível apenas quando o jogo está carregado)
     const catalog = typeof SHOP_ITEMS !== 'undefined' ? SHOP_ITEMS : [];
 
     // Moldura ativa
-    const frameId = activeCosmetics?.frame || null;
+    const frameId   = activeCosmetics?.frame || null;
     const frameItem = frameId ? catalog.find(i => i.id === frameId) : null;
     const frameClass = frameItem?.frameClass || '';
 
-    // Avatar ativo
-    const variantItem = activeAvatarVariantId
-        ? catalog.find(i => i.id === activeAvatarVariantId)
-        : null;
+    // Resolver URL do avatar:
+    // 1. URL salva no banco (avatar_url) — mais confiável na plataforma
+    // 2. URL do catálogo JS (só disponível dentro do TermoCore)
+    // 3. Fallback padrão
+    let imgSrc = 'https://api.dicebear.com/10.x/bottts-neutral/svg?seed=tdunppc5';
 
-    let imgSrc = 'https://api.dicebear.com/10.x/bottts-neutral/svg?seed=tdunppc5'; // padrão
-
-    if (variantItem?.avatarUrl) {
-        imgSrc = variantItem.avatarUrl;
+    if (avatarUrlFromDB) {
+        imgSrc = avatarUrlFromDB;
+    } else if (activeAvatarVariantId) {
+        const variantItem = catalog.find(i => i.id === activeAvatarVariantId);
+        if (variantItem?.avatarUrl) imgSrc = variantItem.avatarUrl;
     }
 
     return `
@@ -154,12 +156,12 @@ function buildAvatarHTML(activeAvatarVariantId, activeCosmetics) {
 async function getUserAvatar(userId) {
     try {
         const client = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
-        if (!client) return buildAvatarHTML(null, {});
+        if (!client) return buildAvatarHTML(null, null, {});
 
-        // Buscar avatar e cosméticos ativos
+        // Buscar avatar ativo (item_id + avatar_url salva no banco) e cosméticos
         const [avatarRes, cosmeticsRes] = await Promise.all([
             client.from('shop_items')
-                .select('item_id')
+                .select('item_id, avatar_url')
                 .eq('user_id', userId)
                 .eq('is_active', true)
                 .or('item_id.like.avatar_%,item_id.like.var_%')
@@ -172,12 +174,13 @@ async function getUserAvatar(userId) {
         ]);
 
         const activeAvatarVariant = avatarRes.data?.item_id || null;
-        const activeCosmetics = cosmeticsRes.data?.active_cosmetics || {};
+        const avatarUrlFromDB      = avatarRes.data?.avatar_url || null;
+        const activeCosmetics      = cosmeticsRes.data?.active_cosmetics || {};
 
-        return buildAvatarHTML(activeAvatarVariant, activeCosmetics);
+        return buildAvatarHTML(activeAvatarVariant, avatarUrlFromDB, activeCosmetics);
     } catch (err) {
         console.error('❌ [DataSync] getUserAvatar:', err);
-        return buildAvatarHTML(null, {});
+        return buildAvatarHTML(null, null, {});
     }
 }
 
@@ -473,12 +476,6 @@ function startDataSyncInterval() {
             userData.coins       = stats.coins;
             userData.spinTickets = stats.spinTickets;
             localStorage.setItem('cg_current_user', JSON.stringify(userData));
-
-            // Atualizar header
-            const coinsEl   = document.getElementById('header-coins');
-            const ticketsEl = document.getElementById('header-tickets');
-            if (coinsEl)   coinsEl.textContent   = (stats.coins || 0).toLocaleString('pt-BR');
-            if (ticketsEl) ticketsEl.textContent  = (stats.spinTickets || 0).toLocaleString('pt-BR');
 
             // Re-renderizar perfil se estiver ativo
             const activeTab = document.querySelector('.nav-btn.active')?.getAttribute('data-nav-btn');
