@@ -246,15 +246,23 @@ async function saveShopItemToSupabase(userId, itemId, isActive = false) {
     if (!client) return false;
 
     try {
+        // v2.2: Se for avatar, salvar a URL da imagem
+        const insertData = {
+            user_id: userId,
+            item_id: itemId,
+            is_active: isActive
+        };
+        
+        if (typeof SHOP_ITEMS !== 'undefined') {
+            const item = SHOP_ITEMS.find(i => i.id === itemId);
+            if (item && item.type === 'avatar_variant' && item.avatarUrl) {
+                insertData.avatar_url = item.avatarUrl;
+            }
+        }
+
         const { error } = await client
             .from('shop_items')
-            .insert([
-                {
-                    user_id: userId,
-                    item_id: itemId,
-                    is_active: isActive
-                }
-            ]);
+            .insert([insertData]);
 
         if (error && error.code !== '23505') {
             console.error('Erro ao salvar item da loja:', error);
@@ -277,9 +285,18 @@ async function updateActiveShopItemToSupabase(userId, itemId, isActive) {
     if (!client) return false;
 
     try {
+        // v2.2: Se for um avatar sendo ativado, buscar a URL no catálogo JS para salvar no banco
+        const updateData = { is_active: isActive };
+        if (isActive && typeof SHOP_ITEMS !== 'undefined') {
+            const item = SHOP_ITEMS.find(i => i.id === itemId);
+            if (item && item.type === 'avatar_variant' && item.avatarUrl) {
+                updateData.avatar_url = item.avatarUrl;
+            }
+        }
+
         const { error } = await client
             .from('shop_items')
-            .update({ is_active: isActive })
+            .update(updateData)
             .eq('user_id', userId)
             .eq('item_id', itemId);
 
